@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preload" href="/css/font-files/Inter.woff2" as="font" type="font/woff2" crossorigin>
+
+
+	  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <meta property="og:title" content="Tobias Ahlin" />
+  <meta property="og:description" content="SpinKit, Moving Letters, projects, and more." />
+  <meta property="og:url" content="https://tobiasahlin.com/index.html" />
+  <meta property="og:type" content="blog" />
+  <meta property="og:image" content="https://tobiasahlin.com/static/-social/og_index-html.jpg" />
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="627">
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@tobiasahlin" />
+  <meta name="twitter:creator" content="@tobiasahlin" />
+
+  <meta name="description" content="SpinKit, Moving Letters, projects, and more." />
+  <meta name="keywords" content=", tobias ahlin, github, spotify, hyper island" />
+
+	<title>
+    Tobias Ahlin
+  </title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Blog RSS Feed">
+  <link rel="apple-touch-icon" href="/images/touch-icon-iphone.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/touch-icon-ipad.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/images/touch-icon-iphone-retina.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/images/touch-icon-ipad-retina.png">
+  <link rel="stylesheet" href="/css/site.css">
+
+
+  <script src="/js/anime.min.js"></script>
+	
+<script type="text/javascript" src="/js/app.js?v=1"></script>
+
+<script defer type="text/javascript" src="/js/portfolio.js"></script>
+
+
+<script>
+	// Clear localStorage if number of posts have changed
+	app.search.postCountKey = "postCount";
+	var postCountCached = parseInt(localStorage.getItem(app.search.postCountKey));
+	var postCount = 129;
+
+	// If number of posts have changed, clear cache
+	if (postCount != postCountCached) { localStorage.clear(); }
+	localStorage.setItem(app.search.postCountKey, 129); 
+</script>
+</head>
+<body class="layout-portfolio">
+
+<div class="site-header site-header-portfolio">
+  <canvas class="site-nav-canvas"></canvas>
+<button class="js-menu menu button-clear " aria-label="Site navigation">
+  <span class="menu-icon-line-1 menu-icon-line"></span>
+  <span class="menu-icon-line-2 menu-icon-line"></span>
+  <span class="menu-icon-line-3 menu-icon-line"></span>
+</button>
+
+<div class="site-nav-overlay js-nav">
+  <div class="nav-content">
+    <div class="js-nav-header nav-header">
+      <span class="nav-header-text">Tobias Ahlin</span>
+      <div class="nav-header-line js-nav-header-line"></div>
+    </div>
+
+    <ul class="nav-categories">
+      <li class="nav-category js-nav-animate"><a href="/" class="nav-link">Overview</a></li>
+      <li class="nav-category js-nav-animate"><a href="/blog/" class="nav-link">Blog</a></li>
+      <li class="nav-category js-nav-animate"><a href="/blog/tutorials/" class="nav-link">Tutorials</a></li>
+    </ul>
+
+    <div class="nav-sublinks js-nav-animate">
+      <div class="js-nav-animate">
+      <a class="nav-link nav-sublink" href="/moving-letters/">Moving Letters</a>
+      <a class="nav-link nav-sublink" href="/typesource/">TypeSource</a>
+      <a class="nav-link nav-sublink" href="/spinkit/">SpinKit</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  <h1 class="site-name site-name-portfolio">
+  <a class="siteLogoLink " href="/" aria-label="Start page">
+  <svg  class="siteHead-logoMark"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+</a>
+  
+</h1>
+  <button class="site-search js-search button-clear" aria-label="Search site">
+  <span class="site-search-icon"><svg xmlns="http://www.w3.org/2000/svg" class="site-search-icon-svg" width="20" height="20" viewBox="0 0 38.96 41.469">
+  <circle class="site-search-icon-circle" fill="none" stroke-width="4px" cx="16.465" cy="17.3" r="14.465"/>
+  <path class="site-search-icon-line" d="M2791.72,95.441l3.03-3.034,13.1,13.968-3.03,3.034Z" transform="translate(-2768.88 -67.938)"/>
+</svg>
+</span>
+  <span class="site-search-close-icon">
+    <span class="site-search-close-icon-line site-search-close-icon-line-1"></span>
+    <span class="site-search-close-icon-line site-search-close-icon-line-2"></span>
+  </span>
+</button>
+
+<div class="js-search-overlay site-nav-overlay-search">
+  <div class="site-search-content">
+    <input placeholder="Search…" type="text" class="js-search-input siteSearchInput">
+    <div class="site-search-content-results js-site-search-content-results">
+      <div class="site-search-content-results-list"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+<div class="portfolio-header-bg"></div>
+
+<div class="section hero-section">
+		<div class="hero-tab">
+			<h1 class="hero-name">
+				<span class="hero-tobias"><span class="hero-name-inner">Tobias</span></span>
+				<span class="hero-ahlin"><span class="hero-name-inner">Ahlin</span></span>
+				<span class="hero-bjerrome"><span class="hero-name-inner">Bjerrome</span></span>
+			</h1>
+			<div class="tab-container">
+				<svg  class="tab"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+				<svg  class="tab-outline"  width="1022" height="482" viewBox="0 0 1022 482" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M634.184 481.999L567.587 379.929L500.99 481.999H247.355L573.255 0L886.402 481.999H634.184ZM198.374 198.47H0V0H518.605L198.374 472.076V198.47Z" />
+<path d="M626.67 0C626.67 0 848.8 0 962.621 0C978.369 0 993.472 6.26031 1004.61 17.3996C1015.74 28.5423 1022 43.6521 1022 59.4083C1022 152.061 1022 329.939 1022 422.592C1022 438.348 1015.74 453.458 1004.61 464.6C993.472 475.74 978.369 482 962.621 482H939.816L626.67 0Z" />
+</svg>
+
+			</div>
+		</div>
+
+		<h2 class="portfolio-intro-header">I design, tinker, &amp; teach.</h2>
+</div>
+
+<div class="section grid-items grid-items-feature-first grid-items-peak">
+	<h2 class="section-header">Blog.</h2>
+		
+		     <a href="/blog/responsive-fluid-css-type-scales/" class="grid-item post-preview" style="background-color: #314964">
+    <h1 class="grid-item-header" >Responsive type scales with composable CSS utilities</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+    <img src="/static/fluid-type-icon.svg" width="153" height="155" />
+  </div>
+</div>
+
+</div>
+
+    <p class="grid-item-text" >With the help of calc(), clamp() and CSS vars, we can create composable, responsive, and fluid type scales that smoothly adapts to viewport and container widths.</p>
+  </a>
+		
+		     <a href="/blog/hiding-an-element-if-its-empty/" class="grid-item post-preview" style="background-color: #2b2f3c">
+    <h1 class="grid-item-header" >Hiding empty elements with CSS :empty and :has()</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+    <img src="/static/empty-icon.png" width="153" height="155" />
+  </div>
+</div>
+
+</div>
+
+    <p class="grid-item-text" >You might be used to toggling classes on elements to handle state styles. What if we could just write CSS that reflected the state of the DOM?</p>
+  </a>
+		
+		     <a href="/blog/previous-sibling-css-has/" class="grid-item post-preview" style="background-color: #8e5ea2">
+    <h1 class="grid-item-header" >Selecting previous siblings with CSS :has()</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+    <img src="/static/previous-sibling/icon.png" width="175" height="125" />
+  </div>
+</div>
+
+</div>
+
+    <p class="grid-item-text" >Selecting a previous sibling was for long impossible, but is now a breeze with the has() pseudo-class</p>
+  </a>
+		
+		     <a href="/blog/introduction-to-ab-testing/" class="grid-item post-preview" style="background-color: #3bab87">
+    <h1 class="grid-item-header" style="color: rgba(255,255,255,1)">A brief introduction to A/B-testing</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+    <img src="/static/ab-testing/icon.svg" width="145px" />
+  </div>
+</div>
+
+</div>
+
+    <p class="grid-item-text" style="color: rgba(255,255,255,1)">Learn how to use A/B-testing as a guiding compass for making product decisions, and how to avoid its pitfalls</p>
+  </a>
+		
+		     <a href="/blog/chaining-styles-with-proxy/" class="grid-item post-preview" style="background-color: #FDF0EC">
+    <h1 class="grid-item-header" style="color: rgba(0,0,0,1)">Chaining styles with a JavaScript Proxy</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+    <div class="post-chain-wrapper">
+      <svg class="post-chain-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 82.7 82.7"><path fill="#FFF" d="M71.6 64.2l-7.5 7.4c-.9.9-2.1 1.3-3.4 1.3-1.4 0-2.5-.5-3.4-1.4L46.8 61.1c-.9-.9-1.4-2.1-1.4-3.4 0-1.4.6-2.7 1.7-3.7.1.1.4.4.9 1l1.1 1.1c.2.2.5.4 1 .8.4.3.9.5 1.3.7.4.1.9.2 1.4.2 1.4 0 2.5-.5 3.4-1.4.9-.9 1.4-2.1 1.4-3.4 0-.5-.1-1-.2-1.4-.1-.4-.3-.9-.7-1.3-.3-.4-.6-.8-.8-1-.2-.2-.5-.6-1.1-1.1-.5-.5-.9-.8-1-.9 1-1.1 2.2-1.6 3.6-1.6s2.5.5 3.4 1.4l10.5 10.5c.9.9 1.4 2.1 1.4 3.4.3 1.1-.2 2.3-1.1 3.2zM35.7 28.8c-.1-.1-.4-.4-.9-1l-1.1-1.1c-.2-.2-.5-.4-1-.8-.4-.3-.9-.5-1.3-.7-.4-.1-.9-.2-1.4-.2-1.4 0-2.5.5-3.4 1.4-.9.9-1.4 2.1-1.4 3.4 0 .5.1 1 .2 1.4.1.4.3.9.7 1.3.3.4.6.8.8 1 .2.2.5.6 1.1 1.1.5.5.9.8 1 .9-1 1-2.2 1.6-3.6 1.6s-2.5-.5-3.4-1.4L11.2 25.3c-.9-.9-1.4-2.1-1.4-3.4 0-1.3.5-2.4 1.4-3.4l7.5-7.4c1-.9 2.1-1.4 3.4-1.4 1.4 0 2.5.5 3.4 1.4l10.4 10.5c.9.9 1.4 2.1 1.4 3.4.1 1.5-.5 2.7-1.6 3.8zm42.8 21.7L67.9 39.9c-2.8-2.8-6.3-4.3-10.3-4.3-4.1 0-7.6 1.5-10.5 4.5l-4.5-4.5c3-2.9 4.5-6.4 4.5-10.6 0-4.1-1.4-7.5-4.2-10.3L32.4 4.3C29.6 1.4 26.1 0 22.1 0 18 0 14.6 1.4 11.8 4.2l-7.5 7.4C1.4 14.4 0 17.8 0 21.9s1.4 7.5 4.3 10.3l10.5 10.5c2.8 2.8 6.3 4.3 10.3 4.3 4.1 0 7.6-1.5 10.5-4.5l4.5 4.5c-3 2.9-4.5 6.4-4.5 10.6 0 4.1 1.4 7.5 4.2 10.3l10.4 10.5c2.8 2.9 6.3 4.3 10.3 4.3 4.1 0 7.5-1.4 10.3-4.2l7.5-7.4c2.9-2.8 4.3-6.2 4.3-10.3.1-4-1.3-7.5-4.1-10.3z" /></svg>
+    </div>
+  </div>
+</div>
+<style>
+  .post-chain-wrapper {
+    border-radius: 50%;
+    padding: 25px;
+    background-color: #000;
+    height: 44px;
+    width: 44px;
+    margin: 0 auto;
+  }
+  .post-chain-svg { max-height: 100%; }
+</style>
+
+</div>
+
+    <p class="grid-item-text" style="color: rgba(0,0,0,1)">If you miss method chaining from Ruby or jQuery when working with styles in JavaScript, you can recreate the pattern with a few lines of code</p>
+  </a>
+		
+		     <a href="/blog/layered-smooth-box-shadows/" class="grid-item post-preview" style="background-color: #98bec8">
+    <h1 class="grid-item-header" >Smoother & sharper shadows with layered box-shadows</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+    <div class="blog-traditional-shadow-box">Default</div>
+    <div class="blog-realistic-shadow-box">Smooth</div>
+  </div>
+</div>
+<style>
+  .blog-traditional-shadow-box {
+    background-color: #fff;
+    line-height: 76px;
+    border-radius: 3px;
+    color: #333;
+    margin-right: 15px;
+    display: inline-block;
+    width: 100px;
+    height: 80px;
+    box-shadow: 0 6px 6px rgba(16,27,30,0.4);
+  }
+  .blog-realistic-shadow-box {
+    background-color: #fff;
+    line-height: 76px;
+    border-radius: 3px;
+    margin-left: 15px;
+    display: inline-block;
+    color: #333;
+    width: 100px;
+    height: 80px;
+    box-shadow: 0 1px 1px rgba(16,27,30,0.15), 
+                0 2px 2px rgba(16,27,30,0.15), 
+                0 4px 4px rgba(16,27,30,0.15), 
+                0 8px 8px rgba(16,27,30,0.15), 
+                0 16px 16px rgba(16,27,30,0.15);
+  }
+  .blog-shadow-big {
+    width: 200px;
+    height: 120px;
+    padding-top: 40px;
+    line-height: 20px;
+    margin-bottom: 30px;
+    margin-top: 30px;
+    box-sizing: border-box;
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+  
+  .blog-shadow-label {
+    font-size: 12px;
+    color: #666;
+    display: block;
+  }
+</style>
+
+</div>
+
+    <p class="grid-item-text" >With a simple CSS trick, we can get fine-tuned control over how shadows are rendered, and create richer and more realistic 3D effects</p>
+  </a>
+		
+		     <a href="/blog/move-from-jquery-to-vanilla-javascript/" class="grid-item post-preview" style="background-color: #1c323d">
+    <h1 class="grid-item-header" >Cheat sheet for moving from jQuery to vanilla JavaScript</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+    <svg class="blog-banner-jquery" width="391" height="112" viewBox="0 0 3914 1124" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path class="jquery-logo-letter jquery-logo-j-dot" d="M513.764 186.355H346.729C337.938 186.355 330.905 188.114 329.147 196.904L299.256 327.006C297.498 334.039 302.773 341.071 311.564 341.071H471.566C480.357 341.071 487.39 334.039 489.148 325.248L517.281 193.388C517.281 193.388 520.797 186.355 513.764 186.355Z" fill="#fff" />
+  <path class="jquery-logo-letter jquery-logo-j" d="M301.014 383.27C292.223 383.27 285.19 390.302 283.432 397.335L260.574 497.548L209.584 727.864C209.584 727.864 183.211 849.175 179.694 857.965C179.694 857.965 156.837 945.872 104.089 942.356C79.4731 940.598 51.3409 935.323 51.3409 935.323C35.5166 930.049 35.5166 945.872 33.7583 954.663L0.351398 1097.07C-1.40686 1104.1 3.86789 1111.14 10.9009 1112.89C10.9009 1112.89 82.9897 1123.44 133.979 1123.44H142.771C267.607 1123.44 334.421 1049.6 376.619 849.175L425.851 615.343L471.565 399.093C473.324 392.06 468.049 383.27 461.016 383.27" fill="#fff" />
+  <path class="jquery-logo-letter jquery-logo-q" d="M1245.2 662.816C1245.2 662.816 1324.32 471.18 1341.91 362.175C1366.52 214.492 1292.67 0 1006.08 0C722.998 0 599.919 203.943 552.446 427.226C504.973 650.509 566.512 845.662 849.592 843.904H1280.37C1289.16 843.904 1296.19 836.871 1297.95 829.839L1334.87 690.946C1336.63 683.914 1331.36 676.881 1324.32 676.881H1289.16H1253.99C1246.96 676.881 1243.44 671.607 1243.44 666.332C1245.2 666.332 1245.2 664.574 1245.2 662.816ZM1097.51 546.779L1065.86 657.542C1064.1 664.574 1055.31 669.849 1046.52 669.849H879.483C752.888 669.849 721.239 571.393 752.888 425.468C784.537 276.027 844.318 184.604 969.154 174.055C1139.71 161.748 1174.87 281.301 1132.67 420.194L1097.51 546.779Z" fill="#fff" />
+  <path class="jquery-logo-letter jquery-logo-u" d="M2064.55 186.355H1908.06C1899.27 186.355 1892.24 189.872 1890.48 196.904L1839.49 437.768L1788.5 668.084C1786.74 675.116 1779.71 675.116 1770.92 675.116H1668.94C1566.96 675.116 1579.27 611.824 1600.37 515.126C1600.37 513.368 1665.42 196.904 1665.42 196.904C1667.18 189.872 1661.91 186.355 1653.12 186.355H1505.42C1496.63 186.355 1489.6 189.872 1487.84 196.904L1428.06 515.126C1398.17 687.423 1398.17 838.623 1596.85 843.897C1600.37 843.897 1911.58 843.897 1911.58 843.897C1920.37 843.897 1927.41 840.381 1929.16 833.348L1997.74 513.368L2064.55 193.388C2064.55 193.388 2068.07 186.355 2064.55 186.355Z" fill="#fff" />
+  <path class="jquery-logo-letter jquery-logo-e" d="M2458.4 184.604C2177.08 184.604 2110.27 358.659 2073.34 529.198C2036.42 705.011 2039.94 843.903 2330.05 843.903H2340.6C2456.64 843.903 2595.55 843.903 2595.55 843.903C2602.58 843.903 2611.37 836.871 2613.13 828.08L2641.26 717.318C2643.02 710.285 2637.74 706.769 2628.95 706.769H2366.97C2272.03 706.769 2238.62 676.881 2242.14 611.83C2242.14 604.797 2250.93 585.458 2257.96 585.458H2660.6C2678.18 585.458 2678.18 574.909 2678.18 574.909C2722.14 392.063 2723.9 184.604 2458.4 184.604ZM2532.25 460.63C2532.25 469.421 2504.12 467.663 2504.12 467.663L2286.09 465.905C2279.06 465.905 2275.54 455.356 2275.54 448.323C2275.54 448.323 2275.54 439.533 2277.3 437.775C2294.88 379.756 2344.12 346.352 2425 346.352C2514.67 346.352 2534.01 390.305 2534.01 441.291" fill="#fff" />
+  <path class="jquery-logo-letter jquery-logo-r" d="M3370.94 330.522L3355.11 260.197C3342.81 209.211 3305.88 186.355 3223.24 186.355H2875.11C2866.32 186.355 2859.28 189.872 2857.53 198.662L2725.66 824.558C2723.9 833.349 2723.9 838.623 2723.9 842.139C2725.66 845.655 2739.72 845.655 2748.51 845.655H2869.83C2878.63 845.655 2892.69 845.655 2896.21 843.897C2901.48 842.139 2903.24 829.832 2905 822.8L2947.2 603.033L2999.95 358.653C3001.7 351.62 3008.74 344.587 3017.53 344.587H3362.15C3367.42 344.587 3372.7 337.555 3370.94 330.522Z" fill="#fff" />
+  <path class="jquery-logo-letter jquery-logo-y" d="M3861.49 75.5967C3852.7 75.5967 3708.53 75.5967 3708.53 75.5967C3699.73 75.5967 3690.94 84.3873 3685.67 91.4199L3416.65 485.242C3411.38 492.274 3406.1 492.274 3404.35 483.484L3385.01 397.335C3383.25 390.302 3374.46 383.27 3367.42 383.27H3195.11C3186.32 383.27 3182.81 390.302 3184.56 397.335L3261.93 668.087C3263.69 675.12 3263.69 689.185 3261.93 696.218L3225 833.352C3223.25 840.385 3228.52 843.901 3235.55 843.901H3406.1C3414.9 843.901 3421.93 842.143 3423.69 833.352L3460.61 694.459C3462.37 687.427 3467.64 676.878 3472.92 669.846L3910.73 89.6617C3916 82.6292 3914.24 75.5967 3907.21 75.5967H3861.49Z" fill="#fff" />
+</svg>
+    <div class="blog-banner-jquery-hole"></div>
+  </div>
+</div>
+<style>
+  .blog-banner-jquery {
+    width: 200px;
+    height: 100px;
+    position: relative;
+    z-index: 3;
+  }
+
+  .blog-banner-jquery-hole {
+    background-color: rgba(0,0,0,0.3);
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    z-index: 1;
+    transform: scale(0);
+  }
+</style>
+
+<script>
+var removeJqueryTimeline = anime.timeline({ loop: true });
+removeJqueryTimeline
+  .add({
+    targets: '.blog-banner-jquery-hole',
+    scaleY: [0,0],
+    scaleX: [0,0],
+    duration: 100
+  })
+  .add({
+    targets: '.blog-banner-jquery-hole',
+    scaleY: 1,
+    scaleX: 1,
+    duration: 900,
+    delay: 200
+  })
+  .add({
+    targets: '.jquery-logo-letter',
+    translateX: "2000px",
+    translateY: "500px",
+    scaleY: 0,
+    scaleX: 0,
+    opacity: 0,
+    easing: "easeInExpo",
+    delay: function(el, i) { return i*70 },
+    duration: 500
+  })
+  .add({
+    targets: '.blog-banner-jquery-hole',
+    scaleY: 1.4,
+    scaleX: 1.4,
+    duration: 600,
+    offset: "-=520"
+  })
+  .add({
+    targets: '.blog-banner-jquery-hole',
+    scaleY: 0,
+    scaleX: 0,
+    duration: 600,
+    easing: "easeInExpo"
+  })
+  .add({
+    targets: '.jquery-logo-letter',
+    translateX: [0,0],
+    translateY: [0,0],
+    scaleY: [1,1],
+    scaleX: [1,1],
+    opacity: [0,1],
+    easing: "easeOutExpo",
+    delay: function(el, i) { return 1400+i*70 },
+    duration: 1200
+  });
+app.animations.track(removeJqueryTimeline, document.querySelector(".blog-banner-jquery-hole"));
+</script>
+
+</div>
+
+    <p class="grid-item-text" >This reference guide will help you convert jQuery's most common patterns to vanilla JavaScript</p>
+  </a>
+		
+		     <a href="/blog/flexbox-break-to-new-row/" class="grid-item post-preview" style="background-color: #7290a4">
+    <h1 class="grid-item-header" >Breaking to a new row with flexbox</h1>
+
+    <span class="grid-item-button">
+  <span class="grid-item-button-label">Read more</span>
+</span>
+
+    <div class="article article-preview"><div class="blog-banner">
+  <div class="blog-banner-content">
+      <div class="flexbox-break-banner-logo">
+        <div class="flexbox-break-box flexbox-break-box-1" style="transform: translateX(-60px) scaleY(0.36) scaleX(0.12);"></div>
+        <div class="flexbox-break-box flexbox-break-box-2" style="transform: translateX(-60px) scaleY(0.36) scaleX(0.12);"></div>
+        <div class="flexbox-break-box flexbox-break-box-3" style="transform: translateX(-60px) scaleY(0.36) scaleX(0.12);"></div>
+        <div class="flexbox-break-box flexbox-break-box-4" style="transform: translateX(-60px) scaleY(0.36) scaleX(0.12);"></div>
+        <div class="flexbox-break-box flexbox-break-box-5" style="transform: translateX(-60px) scaleY(0.36) scaleX(0.12);"></div>
+        <div class="flexbox-break-box flexbox-break-box-6" style="transform: translateX(-60px) scaleY(0.36) scaleX(0.12);"></div>
+        <div class="flexbox-break-box flexbox-break-box-7" style="transform: translateX(-60px) scaleY(0.36) scaleX(0.12);"></div>
+      </div>
+  </div>
+</div>
+<style>
+.flexbox-break-banner-logo {
+  margin-top: 20px;
+  width: 100px;
+  height: 30px;
+  display: inline-block;
+  position: relative;
+}
+
+.flexbox-break-box {
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 50% 0;
+}
+</style>
+
+<script>
+var postMasonryBoxTimeline = anime.timeline({ loop: true });
+postMasonryBoxTimeline
+  .add({ /* just one line */ 
+    targets: '.flexbox-break-box',
+    translateX: function(el, i) { return -60+i*20 },
+    scaleY: 0.36,
+    scaleX: 0.12,
+    delay: function(el, i) { return i*70 },
+    easing: "easeOutExpo",
+    duration: 600
+  })
+  .add({
+    targets: '.flexbox-break-box',
+    translateY: function(el, i) { 
+      if (i > 3) return 20;
+      if (i == 3) return 0;
+      return -20;
+    },
+    translateX: function(el, i) {
+      if (i == 0 || i == 4) return -27;
+      if (i == 1 || i == 3 || i == 5) return 0;
+      return 27;
+    },
+    scaleY: 0.36,
+    scaleX: function(el, i) { return i == 3 ? 0.72 : 0.17 },
+    easing: "easeOutExpo",
+    delay: function(el, i) { return 800 + i*20 },
+    duration: 700
+  })
+  .add({
+    targets: '.flexbox-break-box',
+    translateY: 0,
+    translateX: 0,
+    scaleY: 0.36,
+    scaleX: 0.12,
+    easing: "easeInExpo",
+    delay: function(el, i) { return 800 + i*70 },
+    duration: 600
+  })
+  .add({
+    targets: '.flexbox-break-box',
+    translateX: -60,
+    scaleY: 0.36,
+    scaleX: 0.12,
+    duration: 800
+  });
+app.animations.track(postMasonryBoxTimeline, document.querySelector(".flexbox-break-banner-logo"));
+</script>
+
+</div>
+
+    <p class="grid-item-text" >You can break to a new flexbox row or column without setting the size of an item: add a collapsed flex item between two flex items</p>
+  </a>
+		
+
+		<a href="/blog/" aria-label="View blog" class="grid-item grid-item-wide case-item-blog">
+			<div class="grid-item-bg" style="background-image: url(/images/portfolio/blog.jpg)"></div>
+			<h3 class="grid-item-header grid-item-header-blog">Read all posts</h3>
+			<div class="grid-item-divider"></div>
+			<p class="grid-item-text">I write about design, CSS, animation, and the projects that are keeping me busy.</p>
+		</a>
+</div>
+
+<div class="section grid-items grid-items-feature-first">
+	<h2 class="section-header">Projects.</h2>
+
+	<a href="/spinkit/" aria-label="View SpinKit" class="grid-item grid-item-dark-text grid-item-tall case-item-spinkit">
+		<span class="grid-item-button">
+  <span class="grid-item-button-label">View project</span>
+</span>
+		<h3 class="grid-item-header">SpinKit</h3>
+		<div class="case-item-content">
+			<div class="content-spinkit"></div>
+		</div>
+		<p class="grid-item-text">Nobody likes to wait… but you can make it less of a pain. I've created <strong>SpinKit</strong>, an open-source collection of loading spinners animated with CSS.</p>
+	</a>
+
+	<a href="/moving-letters/" aria-label="View Moving Letters" class="grid-item grid-item-tall case-item-moving-letters">
+		<span class="grid-item-button">
+  <span class="grid-item-button-label">View project</span>
+</span>
+		<h3 class="grid-item-header grid-item-header-ml"><span class="grid-item-ml-text-wrapper">Moving Letters</span></h3>
+		<div class="grid-item-divider"></div>
+		<p class="grid-item-text">If you want more playful and expressive typography, I've created an open-source collection of text effects animated with JavaScript and anime.js.</p>
+	</a>
+
+	<a href="/typesource/" aria-label="View TypeSource" class="grid-item grid-item-tall" style="background-color: #1a1a1a">
+		<span class="grid-item-button">
+  <span class="grid-item-button-label">View project</span>
+</span>
+		<h3 class="grid-item-header grid-item-header-typesource">Typesource</h3>
+		<div class="grid-item-divider"></div>
+		<p class="grid-item-text">I created <strong>TypeSource</strong> as a way to browse web fonts by how they look and feel, rather by their name and attributes.</p>
+	</a>
+
+</div>
+
+<div class="section grid-items">
+	<h2 class="section-header">Work.</h2>
+
+	<a href="https://github.com" aria-label="Go to GitHub" class="grid-item grid-item-wide case-item-gh">
+		<div class="grid-item-bg" style="background-image: url(/images/portfolio/github.jpg)"></div>
+		<span class="grid-item-button">
+  <span class="grid-item-button-label">View project</span>
+</span>
+		<h3 class="grid-item-header grid-item-header-gh">GitHub</h3>
+		<div class="case-item-content">
+			<svg class="case-item-icon icon-github" fill="#fff" xmlns="http://www.w3.org/2000/svg" width="62" height="60" viewBox="0 0 62 60"><path d="M31 0a30.7 30.7 0 0 0-9.8 59.9c1.55.3 2.116-.6 2.116-1.4s-.026-2.7-.042-5.3c-8.622 1.9-10.44-4.1-10.44-4.1-1.414-3.5-3.448-4.5-3.448-4.5-2.815-1.9.213-1.9.213-1.9a6.74 6.74 0 0 1 4.746 3.2c2.766 4.7 7.254 3.3 9.023 2.6a6.3 6.3 0 0 1 1.966-4.1c-6.88-.8-14.12-3.5-14.12-15.2a11.964 11.964 0 0 1 3.193-8.3 10.9 10.9 0 0 1 .3-8.1s2.6-.9 8.525 3.1a30.617 30.617 0 0 1 15.522 0c5.92-4 8.517-3.1 8.517-3.1a10.886 10.886 0 0 1 .308 8.1 11.946 11.946 0 0 1 3.186 8.3c0 11.8-7.248 14.4-14.155 15.1a7.52 7.52 0 0 1 2.1 5.7c0 4.1-.04 7.5-.04 8.5 0 .8.56 1.7 2.13 1.4A30.708 30.708 0 0 0 31 0"/></svg>
+		</div>
+		<p class="grid-item-text grid-item-text-gh">I work as a Design Engineer at GitHub, working on our brand, GitHub.com, Mona Sans, and more.</p>
+	</a>
+
+	<a href="https://minecraft.net/" aria-label="Go to Minecraft" class="grid-item grid-item-minecraft">
+		<span class="grid-item-button">
+  <span class="grid-item-button-label">View project</span>
+</span>
+		<h3 class="grid-item-header grid-item-header-minecraft">Minecraft</h3>
+		<div class="case-item-content"><svg xmlns="http://www.w3.org/2000/svg" class="case-item-icon icon-mojang" width="114.688" height="114.688" viewBox="0 0 114.688 114.688"><path class="cls-1" fill="#fff" d="M114.7-.01H33.026A33.04 33.04 0 0 0-.01 33.024V114.7h81.67a33.037 33.037 0 0 0 33.04-33.037V-.01zM71.57 46.643c-18.207-12.147-39.143-4.147-39.143 14.67 0 38.393 63.608 24.467 63.608 24.467s0 9.785-9.786 9.785H27.532c-9.784 0-9.784-9.784-9.784-9.784V36.85c0-9.787 9.783-9.787 9.783-9.787h19.572c9.788 0 19.572 9.786 19.572 9.786 0-28.5 9 10.57 19.572 0 6.92-6.92 9.785 34.25 9.785 34.25l-9.786-4.89s0-9.787-14.68-19.566zm9.785-14.68a4.89 4.89 0 0 1-4.89-4.894c0-2.7 2.19-14.68 4.89-14.68s4.89 11.975 4.89 14.675a4.89 4.89 0 0 1-4.89 4.894z"/></svg></div>
+		<p class="grid-item-text grid-item-text-minecraft">As the <strong>Experience Design Director</strong> at <strong>Minecraft</strong> I worked with the team at <strong>Mojang</strong> to overhaul their UI infrastructure and design and iterate on new and old Minecraft games.</p>
+		<div class="grid-item-minecraft-block" data-frames="21"></div>
+	</a>
+
+	<a href="https://spotify.com" aria-label="Go to Spotify" class="grid-item case-item-spotify">
+		<div class="grid-item-bg" style="background-image: url(/images/portfolio/spotify.jpg)"></div>
+		<span class="grid-item-button">
+  <span class="grid-item-button-label">View project</span>
+</span>
+		<h3 class="grid-item-header">Spotify</h3>
+		<div class="case-item-content"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-434 236 90 90" class="case-item-icon icon-spotify"><path fill="#fff" d="M-389 326c-24.9 0-45-20.1-45-45s20.1-45 45-45 45 20.1 45 45-20.1 45-45 45zm-26.1-30.8c.2 1.3 1.4 2.2 2.7 2.2.4 0 .9-.1 1.3-.2 4.3-.9 8.6-1.6 13-1.7 3.4-.1 6.8 0 10.1.6 5.5.8 10.6 2.6 15.4 5.4.2.1.5.3.7.4 1.3.6 2.8.1 3.5-1.1.7-1.2.4-2.8-.7-3.6-.2-.2-.5-.3-.7-.5-2.8-1.7-5.8-3-8.9-4.1-5.6-1.9-11.4-2.7-17.3-2.8l-6 .3c-3.6.3-7.1.9-10.6 1.7-.3.1-.6.1-.8.2-1.3.6-2 1.9-1.7 3.2zm.2-10.9c.8.3 1.7.3 2.5.1 5.1-1.5 10.4-2.2 15.5-2.2 4.1 0 8 .4 11.9 1.1 5 .9 9.8 2.4 14.4 4.8 1 .5 1.9 1.1 2.9 1.6 1.7 1 3.8.5 4.8-1.2.9-1.4.7-3.7-1.2-4.8-.2-.1-.3-.2-.5-.3-3.5-2.1-7.2-3.7-11.1-4.9-7.6-2.5-15.5-3.5-23.5-3.2-3.7.1-7.4.6-11.1 1.4-1.5.3-3 .7-4.4 1.2-1.4.4-2.3 1.7-2.4 3.2 0 1.4.9 2.7 2.2 3.2zm56.6-15.8c-3.1-1.8-6.3-3.2-9.6-4.4-8.2-2.8-16.6-4.1-25.3-4.3-3.5-.1-7 0-10.5.3-3.3.3-6.5.8-9.8 1.5-1.3.3-2.6.6-3.9 1-1.7.6-2.8 2.2-2.8 4 .1 1.8 1.3 3.4 3 3.9.8.2 1.6.2 2.4 0 1.3-.4 2.6-.7 3.9-1 3.6-.8 7.2-1.2 10.9-1.4 3.2-.2 6.4-.1 9.6 0 3.1.2 6.1.5 9.2 1.1 4.4.8 8.6 1.9 12.7 3.5 2.1.8 4.1 1.8 6 2.9 2.9 1.6 6.3-.4 6.3-3.6 0-.3-.1-.6-.1-.9-.2-1.1-.9-2-2-2.6z"/></svg></div>
+		<p class="grid-item-text">Early on at Spotify I lead the UI design for all products and worked with building the design team.</p>
+	</a>
+
+</div>
+
+
+<div class="section contact-card">
+  <h2 class="section-header">Say hi.</h2>
+
+  <div class="contact-info">
+    <a class="grid-item-header grid-item-header-left" href="mailto:hello@tobiasahlin.com">hello@<br>tobiasahlin.com</a>
+
+    <div class="grid-item-divider grid-item-divider-left"></div>
+    <p class="grid-item-text grid-item-text-left">I love to design and make things. I used to make things at Spotify and Minecraft, and am currently a design engineer at GitHub. <a href="https://twitter.com/tobiasahlin">Say hi!</a><br><br>
+
+    Tobias Ahlin Bjerrome <br>Stockholm, Sweden</p>
+
+    <div class="contact-links">
+      <a class="contact-link" href="https://github.com/tobiasahlin" aria-label="View my GitHub profile"><span class="contact-icon"><svg class="case-item-icon icon-github" fill="#fff" xmlns="http://www.w3.org/2000/svg" width="62" height="60" viewBox="0 0 62 60"><path d="M31 0a30.7 30.7 0 0 0-9.8 59.9c1.55.3 2.116-.6 2.116-1.4s-.026-2.7-.042-5.3c-8.622 1.9-10.44-4.1-10.44-4.1-1.414-3.5-3.448-4.5-3.448-4.5-2.815-1.9.213-1.9.213-1.9a6.74 6.74 0 0 1 4.746 3.2c2.766 4.7 7.254 3.3 9.023 2.6a6.3 6.3 0 0 1 1.966-4.1c-6.88-.8-14.12-3.5-14.12-15.2a11.964 11.964 0 0 1 3.193-8.3 10.9 10.9 0 0 1 .3-8.1s2.6-.9 8.525 3.1a30.617 30.617 0 0 1 15.522 0c5.92-4 8.517-3.1 8.517-3.1a10.886 10.886 0 0 1 .308 8.1 11.946 11.946 0 0 1 3.186 8.3c0 11.8-7.248 14.4-14.155 15.1a7.52 7.52 0 0 1 2.1 5.7c0 4.1-.04 7.5-.04 8.5 0 .8.56 1.7 2.13 1.4A30.708 30.708 0 0 0 31 0"/></svg></span></a>
+      <a class="contact-link contact-link-twitter" href="https://twitter.com/tobiasahlin" aria-label="View my Twitter profile"><svg class="contact-icon twitter-icon-svg" fill="#fff" xmlns="http://www.w3.org/2000/svg" width="60" height="49" viewBox="0 0 60 49"><path d="M60 5.8a32.794 32.794 0 0 1-7.02 2A12.573 12.573 0 0 0 58.416.9a22.046 22.046 0 0 1-7.924 3A11.967 11.967 0 0 0 41.435 0 12.256 12.256 0 0 0 29.21 12.4a11.72 11.72 0 0 0 .225 2.8A34.736 34.736 0 0 1 4.075 2.1 11.406 11.406 0 0 0 2.49 8.3a12.24 12.24 0 0 0 5.436 10.3 12.607 12.607 0 0 1-5.66-1.6v.3a12.426 12.426 0 0 0 9.96 12.1 11.632 11.632 0 0 1-3.168.5 7.87 7.87 0 0 1-2.265-.2 12.483 12.483 0 0 0 11.548 8.7 23.817 23.817 0 0 1-15.4 5.3A14.578 14.578 0 0 1 0 43.5 35.742 35.742 0 0 0 18.79 49c22.64 0 35.094-19.1 35.094-35.7v-1.6a16.4 16.4 0 0 0 6.113-5.9z"/></svg></a>
+    </div>
+
+    <div class="contact-picture">
+      <img src="/images/profile.jpg" class="contact-picture-img" width="1160" height="1160" loading="lazy">
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
