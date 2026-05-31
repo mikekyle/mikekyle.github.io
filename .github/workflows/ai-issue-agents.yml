@@ -1,0 +1,51 @@
+# Combined caller for AI issue agents.
+#
+# Drop this file into any project repo as:
+#   .github/workflows/ai-issue-agents.yml
+#
+# Required repo secrets:
+#   OPENROUTER_API_KEY  (your OpenRouter API key)
+#   GH_PAT              (PAT with repo scope — must be set so the created PR triggers the review workflow)
+#
+# To trigger: apply the matching label to an issue.
+#   agent-ready  → worker (implements the issue)
+#   research     → research agent
+#   decompose    → decompose agent
+
+name: AI Issue Agents
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  worker:
+    if: github.event.label.name == 'agent-ready'
+    uses: mikekyle/py_projects/.github/workflows/issue-worker.yml@master
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    secrets: inherit
+
+  research:
+    if: github.event.label.name == 'research'
+    uses: mikekyle/py_projects/.github/workflows/research.yml@master
+    with:
+      issue_number: ${{ github.event.issue.number }}
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    secrets: inherit
+
+  decompose:
+    if: github.event.label.name == 'decompose'
+    uses: mikekyle/py_projects/.github/workflows/decompose.yml@master
+    with:
+      issue_number: ${{ github.event.issue.number }}
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    secrets: inherit

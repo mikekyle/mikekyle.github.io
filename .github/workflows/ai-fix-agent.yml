@@ -1,0 +1,28 @@
+# Drop this file into any project repo as:
+#   .github/workflows/ai-fix-agent.yml
+#
+# Required repo secrets:
+#   OPENROUTER_API_KEY  (your OpenRouter API key)
+#   GH_PAT              (PAT with repo scope — push triggers the reviewer to re-run)
+#
+# Triggered automatically when the review bot posts a comment containing /ai-fix.
+# Uses /ai-fix (not @claude) to avoid collision with Anthropic's official GitHub App.
+
+name: AI Fix Agent
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  fix:
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/ai-fix') &&
+      (github.event.comment.user.login == 'github-actions[bot]' || github.event.comment.user.login == 'mikekyle')
+    uses: mikekyle/py_projects/.github/workflows/fix-agent.yml@master
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    secrets: inherit
