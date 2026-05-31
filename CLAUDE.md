@@ -54,6 +54,25 @@ git checkout master && git merge style/something-new && git push origin master
 
 To revert to a previous style: merge its branch (or cherry-pick the commit).
 
+## Excluded projects
+
+- **chorus_mail** — deliberately excluded from the public homepage. Not listed in index.html.
+
+### Private repos
+
+For repos that are private, add `card-private` to the card's class list (alongside `card`). This adds a 🔒 badge, disables the link, and shows "Private repo" text. Example:
+
+```html
+<div class="card card-private" style="background-color: #4a3535">
+  <span class="card-button">Private</span>
+  <h3 class="card-title">Project Name</h3>
+  <span class="card-divider"></span>
+  <p class="card-text">Description text</p>
+</div>
+```
+
+Use a `<div>` (not `<a>`) since there's no link target.
+
 ## Deploy
 
 ```bash

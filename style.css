@@ -249,6 +249,32 @@ body {
   opacity: 0.75;
 }
 
+/* --- Private repo cards -------------------------- */
+
+.card-private {
+  cursor: default;
+  pointer-events: none;
+}
+
+.card-private .card-title::before {
+  content: "🔒 ";
+  font-size: 0.7em;
+}
+
+.card-private .card-button {
+  background-color: rgba(0, 0, 0, 0.5);
+  font-style: italic;
+}
+
+.card-private .card-text::after {
+  content: "Private repo";
+  display: block;
+  font-size: 13px;
+  margin-top: 10px;
+  opacity: 0.6;
+  font-style: italic;
+}
+
 /* --- Hero ---------------------------------------- */
 
 .hero {
