@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a model change gets to production</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-preset="sfcr">
+
+<header class="hero">
+  <p class="eyebrow">life_cf_model · Environments spec</p>
+  <h1>How a model change gets to production</h1>
+  <p class="dek">A release-train walkthrough for actuaries — from feature branch on your laptop to tagged deploy on Oracle Cloud. Mix of <strong>approved target workflow</strong> and <strong>what exists in the repo today</strong>.</p>
+</header>
+
+<p class="accuracy-banner">Dashed pipeline boxes = target spec (<code>deploy-preprod.yml</code> / <code>deploy-prod.yml</code> not committed yet). Solid boxes = parsed from <code>ci.yml</code>.</p>
+
+<section id="scrolly">
+  <div class="scrolly-inner">
+    <div class="graphic-pane" aria-live="polite">
+      <div id="graphic" role="img" aria-label="Git and pipeline diagram"></div>
+    </div>
+    <div class="step-pane">
+
+      <div class="step" data-step="0">
+        <p><span class="tag">Actuarial mapping</span> Model change control in software looks like <strong>git on main</strong> — one integration branch that should always be deployable in principle. Nothing goes to prod from a laptop folder copy.</p>
+      </div>
+
+      <div class="step" data-step="1">
+        <p><span class="tag">Dev · local</span> You branch <strong>feature/assumption-schema</strong> from main. This is your working paper — fast iteration with <code>just test</code> on your machine.</p>
+      </div>
+
+      <div class="step" data-step="2">
+        <p>Commits stay on the feature branch until review. Preprod and prod are <strong>shared environments</strong> — you don't point them at half-baked work.</p>
+      </div>
+
+      <div class="step" data-step="3">
+        <p><span class="tag">Implemented today</span> Open a PR → GitHub Actions runs <strong>ci.yml</strong>: checkout, install uv/just, sync dependencies.</p>
+      </div>
+
+      <div class="step" data-step="4">
+        <p><span class="tag">Implemented today</span> CI must pass <strong>lint</strong>, unit/integration <strong>tests</strong>, and a <strong>summary regression</strong> before merge. This is the gatekeeper — like an automated model check.</p>
+      </div>
+
+      <div class="step" data-step="5">
+        <p>Merge the PR to <strong>main</strong>. Main still doesn't auto-deploy to prod — it only receives integrated, reviewed code.</p>
+      </div>
+
+      <div class="step" data-step="6">
+        <p><span class="tag">Target workflow</span> When it's release time, cut <strong>release/2026-Q3</strong> from main. Release branches are where you stabilise a quarterly train.</p>
+      </div>
+
+      <div class="step" data-step="7">
+        <p><span class="tag">Target spec</span> Push <code>release/*</code> → <strong>deploy-preprod</strong> (planned workflow) SSHs to the Oracle VM and runs <code>docker compose -p life-preprod up</code>.</p>
+      </div>
+
+      <div class="step" data-step="8">
+        <p>On preprod you run the <strong>full regression</strong> (<code>REGRESSION_MODE=both</code>) — the software equivalent of parallel UAT. Sign-off is manual for now.</p>
+      </div>
+
+      <div class="step" data-step="9">
+        <p>RC fixes land on the release branch, not directly on prod. Environments are <strong>cattle</strong> — rebuild preprod from git, don't hand-tweak the server.</p>
+      </div>
+
+      <div class="step" data-step="10">
+        <p>Merge release to main and tag <strong>v2026.3.0</strong>. Prod runs an <strong>immutable</strong> tagged version — you never <code>git pull</code> on prod and hope.</p>
+      </div>
+
+      <div class="step" data-step="11">
+        <p><span class="tag">Target spec</span> Tag triggers <strong>deploy-prod</strong> with a GitHub Environment approval gate, then the <code>life-prod</code> compose stack on the same VM — separate DB, separate OCI bucket.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="method">
+  <h2>Method &amp; accuracy</h2>
+  <p>Git topology and release train from <a href="https://github.com/mikekyle/life_cf_model/blob/main/docs/specs/environments.md">life_cf_model/docs/specs/environments.md</a> (approved spec, 2026-06-15). CI steps parsed from <a href="https://github.com/mikekyle/life_cf_model/blob/main/.github/workflows/ci.yml">.github/workflows/ci.yml</a> as implemented today.</p>
+  <ul>
+    <li><strong>Implemented:</strong> PR CI (lint, test, regression on ubuntu-latest)</li>
+    <li><strong>Target spec:</strong> <code>deploy-preprod.yml</code>, <code>deploy-prod.yml</code> — documented in environments.md, not yet in repo</li>
+    <li><strong>Simplified:</strong> One feature branch and one quarterly release shown; hotfix path omitted</li>
+  </ul>
+</section>
+
+<footer class="footer">
+  <p><a href="https://github.com/mikekyle/skills/tree/main/examples/life-cf-git-workflow">Source</a> · Scrolly via git-flow-viz + scrollytelling-data-viz</p>
+</footer>
+
+<script src="https://unpkg.com/intersection-observer@0.12.2/intersection-observer.js"></script>
+<script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@gitgraph/js@1.4.0"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="data/story-data.js"></script>
+<script src="js/git-viz.js"></script>
+<script src="js/pipeline-viz.js"></script>
+<script src="js/flow-viz.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

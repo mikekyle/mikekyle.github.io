@@ -1,0 +1,318 @@
+window.STORY_DATA = {
+  "meta": {
+    "title": "How a model change gets to production",
+    "repo": "mikekyle/life_cf_model",
+    "diagram_type": "hybrid",
+    "accuracy": {
+      "git_topology": "spec",
+      "ci_pipeline": "implemented",
+      "deploy_pipeline": "spec"
+    },
+    "sources": [
+      "docs/specs/environments.md",
+      ".github/workflows/ci.yml"
+    ],
+    "notes": "docs/topology-notes.md"
+  },
+  "gitgraph_options": {
+    "orientation": "vertical",
+    "commit": {
+      "message": {
+        "display": true,
+        "displayAuthor": false
+      }
+    }
+  },
+  "pipeline": {
+    "nodes": [
+      {
+        "id": "checkout",
+        "label": "checkout",
+        "column": 0,
+        "accuracy": "implemented"
+      },
+      {
+        "id": "setup",
+        "label": "uv + just",
+        "column": 1,
+        "accuracy": "implemented"
+      },
+      {
+        "id": "lint",
+        "label": "just lint",
+        "column": 2,
+        "accuracy": "implemented"
+      },
+      {
+        "id": "test",
+        "label": "just test",
+        "column": 3,
+        "accuracy": "implemented"
+      },
+      {
+        "id": "regression",
+        "label": "regression",
+        "column": 4,
+        "accuracy": "implemented"
+      },
+      {
+        "id": "push-release",
+        "label": "push release/*",
+        "column": 0,
+        "accuracy": "spec"
+      },
+      {
+        "id": "ssh",
+        "label": "SSH deploy",
+        "column": 1,
+        "accuracy": "spec"
+      },
+      {
+        "id": "compose-pre",
+        "label": "compose preprod",
+        "column": 2,
+        "accuracy": "spec"
+      },
+      {
+        "id": "regress-vm",
+        "label": "full regression",
+        "column": 3,
+        "accuracy": "spec"
+      },
+      {
+        "id": "tag",
+        "label": "tag v*.*.*",
+        "column": 0,
+        "accuracy": "spec"
+      },
+      {
+        "id": "approval",
+        "label": "approval gate",
+        "column": 1,
+        "accuracy": "spec"
+      },
+      {
+        "id": "compose-prod",
+        "label": "compose prod",
+        "column": 2,
+        "accuracy": "spec"
+      }
+    ],
+    "edges": [
+      {
+        "from": "checkout",
+        "to": "setup"
+      },
+      {
+        "from": "setup",
+        "to": "lint"
+      },
+      {
+        "from": "lint",
+        "to": "test"
+      },
+      {
+        "from": "test",
+        "to": "regression"
+      },
+      {
+        "from": "push-release",
+        "to": "ssh"
+      },
+      {
+        "from": "ssh",
+        "to": "compose-pre"
+      },
+      {
+        "from": "compose-pre",
+        "to": "regress-vm"
+      },
+      {
+        "from": "tag",
+        "to": "approval"
+      },
+      {
+        "from": "approval",
+        "to": "compose-prod"
+      }
+    ],
+    "sequences": [
+      {
+        "visible": [
+          "checkout",
+          "setup"
+        ],
+        "highlight": [
+          "checkout"
+        ],
+        "caption": "CI on PR \u2014 as in ci.yml today"
+      },
+      {
+        "visible": [
+          "checkout",
+          "setup",
+          "lint",
+          "test",
+          "regression"
+        ],
+        "highlight": [
+          "regression"
+        ],
+        "caption": "Lint, test, summary regression \u2014 ci.yml"
+      },
+      {
+        "visible": [
+          "push-release",
+          "ssh",
+          "compose-pre"
+        ],
+        "highlight": [
+          "compose-pre"
+        ],
+        "caption": "Target: deploy-preprod.yml (spec)"
+      },
+      {
+        "visible": [
+          "push-release",
+          "ssh",
+          "compose-pre",
+          "regress-vm"
+        ],
+        "highlight": [
+          "regress-vm"
+        ],
+        "caption": "UAT on preprod VM \u2014 spec"
+      },
+      {
+        "visible": [
+          "tag",
+          "approval",
+          "compose-prod"
+        ],
+        "highlight": [
+          "approval"
+        ],
+        "caption": "Target: deploy-prod.yml (spec)"
+      }
+    ]
+  },
+  "steps": [
+    {
+      "id": "intro",
+      "viz": "git",
+      "gitCommands": [
+        {
+          "op": "commit",
+          "branch": "main",
+          "message": "Life CF model"
+        }
+      ]
+    },
+    {
+      "id": "feature-branch",
+      "viz": "git",
+      "gitCommands": [
+        {
+          "op": "branch",
+          "name": "feature/assumption-schema",
+          "from": "main"
+        },
+        {
+          "op": "commit",
+          "branch": "feature/assumption-schema",
+          "message": "Schema draft"
+        }
+      ]
+    },
+    {
+      "id": "local-work",
+      "viz": "git",
+      "gitCommands": [
+        {
+          "op": "commit",
+          "branch": "feature/assumption-schema",
+          "message": "just test green"
+        }
+      ]
+    },
+    {
+      "id": "pr-ci-start",
+      "viz": "pipeline",
+      "pipelineStep": 0
+    },
+    {
+      "id": "pr-ci-full",
+      "viz": "pipeline",
+      "pipelineStep": 1
+    },
+    {
+      "id": "merge-main",
+      "viz": "git",
+      "gitCommands": [
+        {
+          "op": "merge",
+          "into": "main",
+          "from": "feature/assumption-schema"
+        }
+      ]
+    },
+    {
+      "id": "release-branch",
+      "viz": "git",
+      "gitCommands": [
+        {
+          "op": "branch",
+          "name": "release/2026-Q3",
+          "from": "main"
+        },
+        {
+          "op": "commit",
+          "branch": "release/2026-Q3",
+          "message": "RC stabilisation"
+        }
+      ]
+    },
+    {
+      "id": "preprod-deploy",
+      "viz": "pipeline",
+      "pipelineStep": 2
+    },
+    {
+      "id": "preprod-uat",
+      "viz": "pipeline",
+      "pipelineStep": 3
+    },
+    {
+      "id": "rc-fixes",
+      "viz": "git",
+      "gitCommands": [
+        {
+          "op": "commit",
+          "branch": "release/2026-Q3",
+          "message": "Preprod fixes"
+        }
+      ]
+    },
+    {
+      "id": "tag-release",
+      "viz": "git",
+      "gitCommands": [
+        {
+          "op": "merge",
+          "into": "main",
+          "from": "release/2026-Q3"
+        },
+        {
+          "op": "tag",
+          "on": "main",
+          "name": "v2026.3.0"
+        }
+      ]
+    },
+    {
+      "id": "prod-deploy",
+      "viz": "pipeline",
+      "pipelineStep": 4
+    }
+  ]
+};
