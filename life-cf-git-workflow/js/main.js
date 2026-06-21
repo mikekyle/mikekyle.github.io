@@ -21,7 +21,7 @@
       el.style.minHeight = stepH + 'px';
     });
     if (isMobile()) {
-      var graphicH = Math.min(360, Math.max(260, Math.round(h * 0.38)));
+      var graphicH = Math.min(Math.round(h * 0.4), Math.max(280, Math.round(h * 0.36)));
       document.documentElement.style.setProperty('--graphic-height-mobile', graphicH + 'px');
     }
   }

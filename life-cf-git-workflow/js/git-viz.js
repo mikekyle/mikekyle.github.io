@@ -1,7 +1,6 @@
 (function (global) {
   var GitgraphJS = global.GitgraphJS;
   var data = null;
-  var reduced = false;
 
   var DEFAULT_OPTIONS = {
     template: 'metro',
@@ -10,6 +9,10 @@
       message: { display: true, displayAuthor: false, font: 'normal 10px sans-serif' },
     },
   };
+
+  function isMobile() {
+    return global.matchMedia('(max-width: 768px)').matches;
+  }
 
   function mergeOptions(preset) {
     var base = Object.assign({}, DEFAULT_OPTIONS);
@@ -20,12 +23,23 @@
     } else {
       base.branchColors = ['#D67A60', '#1a1a1a', '#888', '#c4a882'];
     }
+    if (isMobile()) {
+      base.mode = 'compact';
+      base.commit = Object.assign({}, base.commit, {
+        message: { display: false, displayAuthor: false },
+      });
+      if (base.branch) {
+        base.branch.spacing = 14;
+      }
+      if (base.commit.spacing !== undefined) {
+        base.commit.spacing = 28;
+      }
+    }
     return Object.assign(base, (data && data.gitgraph_options) || {});
   }
 
   function initGitViz(dataset) {
     data = dataset;
-    reduced = global.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   function branchRegistry() {
@@ -83,6 +97,32 @@
     return out;
   }
 
+  function fitGitGraph(host) {
+    var svg = host.querySelector('svg');
+    if (!svg) return;
+    var pane = host.closest('#viz-root') || host.parentElement;
+    var maxW = (pane && pane.clientWidth) || 320;
+    var maxH = (pane && pane.clientHeight) || 280;
+    if (maxW < 40 || maxH < 40) return;
+
+    svg.style.transform = '';
+    svg.style.transformOrigin = '';
+    host.style.height = '';
+    host.style.width = '';
+
+    var box = svg.getBBox();
+    if (!box.width || !box.height) return;
+
+    var pad = 8;
+    var scale = Math.min((maxW - pad) / box.width, (maxH - pad) / box.height, 1);
+    if (scale < 1) {
+      svg.style.transformOrigin = 'top center';
+      svg.style.transform = 'scale(' + scale.toFixed(3) + ')';
+      host.style.height = Math.ceil(box.height * scale) + 'px';
+      host.style.width = '100%';
+    }
+  }
+
   function renderGit(container, commands, preset) {
     container.innerHTML = '';
     var wrap = document.createElement('div');
@@ -92,9 +132,12 @@
     var reg = branchRegistry();
     if (!commands.length) {
       ensureBranch(reg, gitgraph, 'main').commit('start');
-      return;
+    } else {
+      commands.forEach(function (cmd) { runCommand(reg, gitgraph, cmd); });
     }
-    commands.forEach(function (cmd) { runCommand(reg, gitgraph, cmd); });
+    global.requestAnimationFrame(function () {
+      fitGitGraph(wrap);
+    });
   }
 
   function updateGitViz(stepIndex, container, steps, preset) {
@@ -107,5 +150,6 @@
     initGitViz: initGitViz,
     updateGitViz: updateGitViz,
     collectCommandsThrough: collectCommandsThrough,
+    fitGitGraph: fitGitGraph,
   };
 })(window);

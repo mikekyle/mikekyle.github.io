@@ -41,8 +41,18 @@ a { color: var(--accent); }
   display: flex; align-items: center; justify-content: center;
   padding: 1rem; z-index: 2; background: var(--bg);
 }
-#graphic { width: 100%; max-width: 440px; min-height: 240px; }
-#graphic svg, .gitgraph-host { display: block; max-width: 100%; height: auto; }
+#graphic { width: 100%; max-width: 440px; min-height: 200px; height: 100%; }
+#viz-root {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+}
+#graphic svg { display: block; max-width: 100%; }
+.gitgraph-host { width: 100%; display: flex; justify-content: center; }
 .step-pane { width: 50%; padding: 0 2rem 4rem; }
 .step { display: flex; align-items: center; opacity: 0.35; transition: opacity 0.35s ease; }
 .step.is-active { opacity: 1; }
@@ -57,7 +67,15 @@ a { color: var(--accent); }
 
 @media (max-width: 768px) {
   .scrolly-inner { display: block; }
-  .graphic-pane { width: 100%; height: var(--graphic-height-mobile); min-height: 260px; max-height: 360px; border-bottom: 1px solid var(--border); }
+  .graphic-pane {
+    width: 100%;
+    height: var(--graphic-height-mobile);
+    min-height: 280px;
+    max-height: 42vh;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+    padding-top: 0.5rem;
+  }
   .step-pane { width: 100%; padding: 0 1.25rem 2rem; }
   .step { align-items: flex-start; padding-top: 1.5rem; }
   .step p { max-width: none; font-size: 1rem; }
