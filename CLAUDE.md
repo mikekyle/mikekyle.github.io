@@ -32,15 +32,24 @@ Inspired by [tobiasahlin.com](https://tobiasahlin.com/). Key characteristics:
 - **Font stack** — Inter (weight 800 for headers), falling back to system sans-serif.
 - **Three files** — `index.html`, `style.css`, `script.js` (~75 lines, zero dependencies).
 
+### Go tile media (Tobias mid-card graphic)
+
+Tobias project cards use **title → graphic → subtitle** (no divider when a graphic is present). Go cards follow that:
+
+- Canvas lives in a compact `.card-media` slot (~128×112) between title and text
+- Stones crop to the pattern bounding box and fill the slot (not a full-card background)
+- Previous full-bleed translucent background layout kept on branch `style/go-stones-background`
+
 ### Style auditioning workflow
 
 Designs are tried on separate branches, then merged to `master` to preview at `https://mikekyle.github.io`:
 
 | Branch | Style | Status |
 |---|---|---|
-| `master` (current) | tobias-inspired — bold grid, massive headers | **Chosen** |
+| `master` (current) | tobias-inspired — bold grid, Go mid-card stone graphic | **Chosen** |
+| `style/go-stones-background` | Same cards, but translucent stones as full-card background + dividers | Audition alternate |
 | `style/kokorobot-inspired` | Dark journal — emoji stamps, serif headings, left-border cards | Auditioned, not chosen |
-| `style/tobias-inspired` | Same as master | Reference branch |
+| `style/tobias-inspired` | Same as early master (pre–Go media) | Reference branch |
 | First commit (`2075e68`) | Minimal clean CSS — sparse white/grey cards | Original |
 
 To try a new design:

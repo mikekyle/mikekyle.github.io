@@ -77,6 +77,9 @@
      Patterns are data-driven. Edit GO_PATTERNS (or swap the
      data-go-pattern attribute on a card) to change what plays.
 
+     Layout: Tobias-style — stones sit in a compact .card-media
+     slot between the title and subtitle (not a full-card bg).
+
      Stone format: { x, y, color }
        x, y  — 0-indexed intersections (0,0 = top-left)
        color — 'B' (black) or 'W' (white)
@@ -86,7 +89,8 @@
 
   /**
    * Draft patterns — swap / tweak freely.
-   * Coordinates are on a `size`×`size` board (no grid lines drawn).
+   * Coordinates are on a logical board; the canvas crops to the
+   * stone bounding box so the cluster fills the media slot.
    */
   var GO_PATTERNS = {
     /**
@@ -97,10 +101,7 @@
       size: 9,
       stoneDelay: 320,
       stoneDuration: 280,
-      opacity: 0.55,
-      // Shift board toward top-left so the corner joseki reads clearly
-      offsetX: -0.12,
-      offsetY: -0.14,
+      opacity: 0.95,
       stones: [
         { x: 3, y: 3, color: 'B' }, // 4-4 star
         { x: 5, y: 3, color: 'W' }, // high approach
@@ -122,9 +123,7 @@
       size: 9,
       stoneDelay: 300,
       stoneDuration: 260,
-      opacity: 0.55,
-      offsetX: -0.16,
-      offsetY: -0.16,
+      opacity: 0.95,
       stones: [
         { x: 1, y: 1, color: 'B' },
         { x: 2, y: 1, color: 'B' },
@@ -152,9 +151,11 @@
 
   /**
    * Create and run a Go animation on one card's canvas.
+   * Canvas lives in .card-media between title and subtitle.
    * @param {HTMLElement} card
    */
   function initGoCard(card) {
+    var media = card.querySelector('.card-media');
     var canvas = card.querySelector('.card-canvas');
     var patternName = card.getAttribute('data-go-pattern');
     var pattern = GO_PATTERNS[patternName];
@@ -166,13 +167,29 @@
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    var size = pattern.size || 9;
     var stoneDelay = pattern.stoneDelay != null ? pattern.stoneDelay : 300;
     var stoneDuration = pattern.stoneDuration != null ? pattern.stoneDuration : 260;
-    var opacity = pattern.opacity != null ? pattern.opacity : 0.85;
-    var offsetX = pattern.offsetX || 0; // fraction of card width, negative = left
-    var offsetY = pattern.offsetY || 0; // fraction of card height, negative = up
+    var opacity = pattern.opacity != null ? pattern.opacity : 0.95;
     var stones = pattern.stones;
+
+    // Bounding box of stones — crop the board so the cluster fills the slot
+    var minX = Infinity;
+    var maxX = -Infinity;
+    var minY = Infinity;
+    var maxY = -Infinity;
+    stones.forEach(function (s) {
+      if (s.x < minX) minX = s.x;
+      if (s.x > maxX) maxX = s.x;
+      if (s.y < minY) minY = s.y;
+      if (s.y > maxY) maxY = s.y;
+    });
+    // One empty intersection of padding around the cluster
+    minX -= 1;
+    maxX += 1;
+    minY -= 1;
+    maxY += 1;
+    var spanX = Math.max(1, maxX - minX);
+    var spanY = Math.max(1, maxY - minY);
 
     // Per-stone animation progress 0→1; -1 = not started
     var progress = stones.map(function () { return -1; });
@@ -184,7 +201,8 @@
     var cssH = 0;
 
     function resize() {
-      var rect = card.getBoundingClientRect();
+      var host = media || canvas.parentElement || card;
+      var rect = host.getBoundingClientRect();
       cssW = rect.width;
       cssH = rect.height;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -197,18 +215,21 @@
 
     /**
      * Map board intersection → canvas pixel centre.
-     * Board is centred in the card with padding so stones
-     * sit as a decorative field behind the copy.
+     * Fits the stone cluster (plus 1-point padding) into the
+     * compact media slot, centred — Tobias-style mid-card graphic.
      */
     function intersectionToXY(x, y) {
-      var pad = Math.min(cssW, cssH) * 0.12;
-      var boardSpan = Math.min(cssW, cssH) - pad * 2;
-      var originX = (cssW - boardSpan) / 2 + offsetX * cssW;
-      var originY = (cssH - boardSpan) / 2 + offsetY * cssH;
-      var cell = boardSpan / (size - 1);
+      var pad = Math.min(cssW, cssH) * 0.08;
+      var availW = cssW - pad * 2;
+      var availH = cssH - pad * 2;
+      var cell = Math.min(availW / spanX, availH / spanY);
+      var boardW = spanX * cell;
+      var boardH = spanY * cell;
+      var originX = (cssW - boardW) / 2;
+      var originY = (cssH - boardH) / 2;
       return {
-        cx: originX + x * cell,
-        cy: originY + y * cell,
+        cx: originX + (x - minX) * cell,
+        cy: originY + (y - minY) * cell,
         radius: cell * 0.42,
       };
     }
