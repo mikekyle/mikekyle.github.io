@@ -97,7 +97,10 @@
       size: 9,
       stoneDelay: 320,
       stoneDuration: 280,
-      opacity: 0.88,
+      opacity: 0.55,
+      // Shift board toward top-left so the corner joseki reads clearly
+      offsetX: -0.12,
+      offsetY: -0.14,
       stones: [
         { x: 3, y: 3, color: 'B' }, // 4-4 star
         { x: 5, y: 3, color: 'W' }, // high approach
@@ -119,7 +122,9 @@
       size: 9,
       stoneDelay: 300,
       stoneDuration: 260,
-      opacity: 0.88,
+      opacity: 0.55,
+      offsetX: -0.16,
+      offsetY: -0.16,
       stones: [
         { x: 1, y: 1, color: 'B' },
         { x: 2, y: 1, color: 'B' },
@@ -165,6 +170,8 @@
     var stoneDelay = pattern.stoneDelay != null ? pattern.stoneDelay : 300;
     var stoneDuration = pattern.stoneDuration != null ? pattern.stoneDuration : 260;
     var opacity = pattern.opacity != null ? pattern.opacity : 0.85;
+    var offsetX = pattern.offsetX || 0; // fraction of card width, negative = left
+    var offsetY = pattern.offsetY || 0; // fraction of card height, negative = up
     var stones = pattern.stones;
 
     // Per-stone animation progress 0→1; -1 = not started
@@ -196,27 +203,14 @@
     function intersectionToXY(x, y) {
       var pad = Math.min(cssW, cssH) * 0.12;
       var boardSpan = Math.min(cssW, cssH) - pad * 2;
-      // Prefer slightly upper placement so text (centred) reads cleanly
-      var offsetX = (cssW - boardSpan) / 2;
-      var offsetY = (cssH - boardSpan) / 2 - cssH * 0.04;
+      var originX = (cssW - boardSpan) / 2 + offsetX * cssW;
+      var originY = (cssH - boardSpan) / 2 + offsetY * cssH;
       var cell = boardSpan / (size - 1);
       return {
-        cx: offsetX + x * cell,
-        cy: offsetY + y * cell,
+        cx: originX + x * cell,
+        cy: originY + y * cell,
         radius: cell * 0.42,
       };
-    }
-
-    /**
-     * Stones near the card centre (where the title sits) fade down
-     * so copy stays readable; edge stones stay fuller.
-     */
-    function alphaAt(cx, cy) {
-      var dx = (cx - cssW / 2) / (cssW * 0.55);
-      var dy = (cy - cssH / 2) / (cssH * 0.55);
-      var d = Math.sqrt(dx * dx + dy * dy);
-      var edge = Math.max(0, Math.min(1, d));
-      return opacity * (0.28 + 0.72 * edge);
     }
 
     function drawStone(cx, cy, radius, color, scale) {
@@ -225,7 +219,7 @@
       ctx.save();
       ctx.translate(cx, cy);
       ctx.scale(scale, scale);
-      ctx.globalAlpha = alphaAt(cx, cy);
+      ctx.globalAlpha = opacity;
 
       ctx.beginPath();
       ctx.arc(0, 0, radius, 0, Math.PI * 2);
