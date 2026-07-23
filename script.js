@@ -94,23 +94,34 @@
    */
   var GO_PATTERNS = {
     /**
-     * Avalanche (nadare) joseki fragment — Joseki Study card.
-     * Spec coords were 1-indexed on a 6×6; stored here 0-indexed.
+     * Avalanche (nadare) joseki — Joseki Study card.
+     * Coords as specified (0-indexed). User listed board:7 but sequence
+     * reaches x=7, so size is 8 (intersections 0–7). Bounding-box crop
+     * fills the media slot either way.
      * stoneDelay = 65% of the previous 320ms default → 208.
      */
     'avelanche': {
-      size: 6,
+      size: 8,
       stoneDelay: 208,
       stoneDuration: 280,
       opacity: 0.95,
       stones: [
-        { x: 2, y: 3, color: 'B' }, // 3,4
-        { x: 4, y: 3, color: 'W' }, // 5,4
-        { x: 4, y: 2, color: 'B' }, // 5,3
-        { x: 3, y: 3, color: 'W' }, // 4,4
-        { x: 3, y: 2, color: 'B' }, // 4,3
-        { x: 2, y: 4, color: 'W' }, // 3,5
-        { x: 5, y: 3, color: 'B' }, // 6,4
+        { x: 3, y: 4, color: 'B' },
+        { x: 5, y: 4, color: 'W' },
+        { x: 5, y: 3, color: 'B' },
+        { x: 4, y: 4, color: 'W' },
+        { x: 4, y: 3, color: 'B' },
+        { x: 3, y: 5, color: 'W' },
+        { x: 6, y: 4, color: 'B' },
+        { x: 3, y: 3, color: 'W' },
+        { x: 2, y: 4, color: 'B' },
+        { x: 3, y: 2, color: 'W' },
+        { x: 4, y: 2, color: 'B' },
+        { x: 6, y: 3, color: 'W' },
+        { x: 6, y: 2, color: 'B' },
+        { x: 7, y: 3, color: 'W' },
+        { x: 2, y: 5, color: 'B' },
+        { x: 3, y: 6, color: 'W' },
       ],
     },
 
