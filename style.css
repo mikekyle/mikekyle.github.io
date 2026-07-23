@@ -112,6 +112,23 @@ body {
   color: #fff;
 }
 
+/* Canvas animation layer behind card copy */
+.card-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.card-go .card-title,
+.card-go .card-divider,
+.card-go .card-text,
+.card-go .card-button {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
 .card:hover {
   color: #fff;
 }
@@ -173,6 +190,7 @@ body {
 .card-divider {
   display: block;
   position: relative;
+  z-index: 10;
   height: 3px;
   background-color: currentColor;
   width: 60px;
