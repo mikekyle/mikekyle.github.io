@@ -94,23 +94,23 @@
    */
   var GO_PATTERNS = {
     /**
-     * Classic 4-4 high-approach keima joseki (top-left corner).
-     * Recognisable opening sequence for any club player.
+     * Avalanche (nadare) joseki fragment — Joseki Study card.
+     * Spec coords were 1-indexed on a 6×6; stored here 0-indexed.
+     * stoneDelay = 65% of the previous 320ms default → 208.
      */
-    'keima-joseki': {
-      size: 9,
-      stoneDelay: 320,
+    'avelanche': {
+      size: 6,
+      stoneDelay: 208,
       stoneDuration: 280,
       opacity: 0.95,
       stones: [
-        { x: 3, y: 3, color: 'B' }, // 4-4 star
-        { x: 5, y: 3, color: 'W' }, // high approach
-        { x: 2, y: 5, color: 'B' }, // keima
-        { x: 5, y: 5, color: 'W' }, // two-space jump
-        { x: 3, y: 5, color: 'B' }, // solidify
-        { x: 6, y: 2, color: 'W' }, // knight toward side
-        { x: 5, y: 1, color: 'B' }, // press
-        { x: 7, y: 3, color: 'W' }, // extend
+        { x: 2, y: 3, color: 'B' }, // 3,4
+        { x: 4, y: 3, color: 'W' }, // 5,4
+        { x: 4, y: 2, color: 'B' }, // 5,3
+        { x: 3, y: 3, color: 'W' }, // 4,4
+        { x: 3, y: 2, color: 'B' }, // 4,3
+        { x: 2, y: 4, color: 'W' }, // 3,5
+        { x: 5, y: 3, color: 'B' }, // 6,4
       ],
     },
 
