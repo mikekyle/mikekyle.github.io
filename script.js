@@ -151,7 +151,7 @@
       opacity: 0.95,
       // Near-simultaneous rush: appear times randomised inside this window
       setupJitter: 55,
-      setupDuration: 200,
+      setupDuration: 400,
       thinkPause: 4200,
       stoneDelay: 480,
       stoneDuration: 260,
