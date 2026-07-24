@@ -84,14 +84,28 @@
        x, y  — 0-indexed intersections (0,0 = top-left)
        color — 'B' (black) or 'W' (white)
 
-     Order of the stones array = play order (animated one-by-one).
+     Two pattern shapes:
+
+     1) Simple sequence (joseki):
+        { stones: [...], stoneDelay, stoneDuration, opacity }
+
+     2) Tsumego:
+        {
+          setup: [...],            // initial problem stones
+          setupJitter,             // ms window — randomised appear times
+          setupDuration,           // pop-in duration
+          thinkPause,              // long pause after setup
+          moves: [                 // solution, step by step
+            { x, y, color, captures?: [{x,y}, ...] }
+          ],
+          stoneDelay,              // delay between solution moves
+          stoneDuration,
+          captureDelay,            // remove captures shortly after placing
+          captureDuration,
+          opacity
+        }
      ============================================================ */
 
-  /**
-   * Draft patterns — swap / tweak freely.
-   * Coordinates are on a logical board; the canvas crops to the
-   * stone bounding box so the cluster fills the media slot.
-   */
   var GO_PATTERNS = {
     /**
      * Avalanche (nadare) joseki — Joseki Study card.
@@ -126,26 +140,61 @@
     },
 
     /**
-     * Classic L+1 / "bent four in the corner" setup flavour —
-     * a short life-and-death shape every tsumego student knows.
-     * Draft only; swap for a real problem later.
+     * Small ishinoshita (石の下) — Tsumego Pages card.
+     * Setup rushes in (randomised, near-simultaneous), long think pause,
+     * then solution step-by-step with captures shortly after the capturing
+     * stone lands. Coords as specified (0-indexed); board listed as 6 but
+     * reaches 6 → size 7.
      */
-    'tsume-lgroup': {
-      size: 9,
-      stoneDelay: 300,
-      stoneDuration: 260,
+    'small-ishinoshita': {
+      size: 7,
       opacity: 0.95,
-      stones: [
-        { x: 1, y: 1, color: 'B' },
-        { x: 2, y: 1, color: 'B' },
-        { x: 3, y: 1, color: 'B' },
+      // Near-simultaneous rush: appear times randomised inside this window
+      setupJitter: 55,
+      setupDuration: 200,
+      thinkPause: 4200,
+      stoneDelay: 480,
+      stoneDuration: 260,
+      // Captures vanish just after the capturing stone — shorter than move gap
+      captureDelay: 100,
+      captureDuration: 160,
+      setup: [
         { x: 1, y: 2, color: 'B' },
-        { x: 1, y: 3, color: 'B' },
-        { x: 2, y: 3, color: 'W' },
+        { x: 2, y: 2, color: 'B' },
+        { x: 3, y: 3, color: 'B' },
+        { x: 4, y: 2, color: 'B' },
+        { x: 5, y: 2, color: 'B' },
+        { x: 1, y: 4, color: 'W' },
+        { x: 2, y: 4, color: 'W' },
+        { x: 3, y: 4, color: 'W' },
+        { x: 4, y: 4, color: 'W' },
+        { x: 4, y: 3, color: 'W' },
+        { x: 5, y: 3, color: 'W' },
+        { x: 6, y: 3, color: 'W' },
+        { x: 6, y: 2, color: 'W' },
+        { x: 6, y: 1, color: 'W' },
+      ],
+      moves: [
+        { x: 5, y: 1, color: 'B' },
+        { x: 3, y: 1, color: 'W' },
+        { x: 2, y: 1, color: 'B' },
         { x: 3, y: 2, color: 'W' },
-        { x: 3, y: 3, color: 'W' },
-        { x: 4, y: 1, color: 'W' },
-        { x: 2, y: 2, color: 'W' }, // eye-space fill — order readable as a problem unfold
+        {
+          x: 4, y: 1, color: 'B',
+          captures: [{ x: 3, y: 1 }, { x: 3, y: 2 }],
+        },
+        { x: 3, y: 2, color: 'W' },
+        { x: 2, y: 3, color: 'B' },
+        {
+          x: 3, y: 1, color: 'W',
+          captures: [
+            { x: 4, y: 2 },
+            { x: 4, y: 1 },
+            { x: 5, y: 2 },
+            { x: 5, y: 1 },
+          ],
+        },
+        { x: 4, y: 2, color: 'B' },
       ],
     },
   };
@@ -153,16 +202,42 @@
   var prefersReducedMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /**
-   * Ease-out cubic for stone pop-in.
-   */
   function easeOutCubic(t) {
     return 1 - Math.pow(1 - t, 3);
   }
 
+  function easeInCubic(t) {
+    return t * t * t;
+  }
+
+  function shuffled(arr) {
+    var out = arr.slice();
+    for (var i = out.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = out[i];
+      out[i] = out[j];
+      out[j] = tmp;
+    }
+    return out;
+  }
+
+  function collectCoords(pattern) {
+    var pts = [];
+    function push(s) {
+      if (!s) return;
+      pts.push(s);
+      if (s.captures) {
+        s.captures.forEach(function (c) { pts.push(c); });
+      }
+    }
+    if (pattern.setup) pattern.setup.forEach(push);
+    if (pattern.moves) pattern.moves.forEach(push);
+    if (pattern.stones) pattern.stones.forEach(push);
+    return pts;
+  }
+
   /**
    * Create and run a Go animation on one card's canvas.
-   * Canvas lives in .card-media between title and subtitle.
    * @param {HTMLElement} card
    */
   function initGoCard(card) {
@@ -171,30 +246,31 @@
     var patternName = card.getAttribute('data-go-pattern');
     var pattern = GO_PATTERNS[patternName];
 
-    if (!canvas || !pattern || !pattern.stones || !pattern.stones.length) {
-      return;
-    }
+    if (!canvas || !pattern) return;
+
+    var isTsumego = !!(pattern.setup && pattern.moves);
+    var isSimple = !!(pattern.stones && pattern.stones.length);
+
+    if (!isTsumego && !isSimple) return;
 
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    var opacity = pattern.opacity != null ? pattern.opacity : 0.95;
     var stoneDelay = pattern.stoneDelay != null ? pattern.stoneDelay : 300;
     var stoneDuration = pattern.stoneDuration != null ? pattern.stoneDuration : 260;
-    var opacity = pattern.opacity != null ? pattern.opacity : 0.95;
-    var stones = pattern.stones;
 
-    // Bounding box of stones — crop the board so the cluster fills the slot
+    // Bounding box across every coord that ever appears
     var minX = Infinity;
     var maxX = -Infinity;
     var minY = Infinity;
     var maxY = -Infinity;
-    stones.forEach(function (s) {
+    collectCoords(pattern).forEach(function (s) {
       if (s.x < minX) minX = s.x;
       if (s.x > maxX) maxX = s.x;
       if (s.y < minY) minY = s.y;
       if (s.y > maxY) maxY = s.y;
     });
-    // One empty intersection of padding around the cluster
     minX -= 1;
     maxX += 1;
     minY -= 1;
@@ -202,14 +278,17 @@
     var spanX = Math.max(1, maxX - minX);
     var spanY = Math.max(1, maxY - minY);
 
-    // Per-stone animation progress 0→1; -1 = not started
-    var progress = stones.map(function () { return -1; });
     var started = false;
     var startTime = 0;
     var rafId = null;
     var dpr = 1;
     var cssW = 0;
     var cssH = 0;
+    var settled = false;
+
+    // Live stone instances (same intersection may reappear after a capture)
+    var stoneInstances = [];
+    var timelineBuilt = false;
 
     function resize() {
       var host = media || canvas.parentElement || card;
@@ -224,11 +303,6 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    /**
-     * Map board intersection → canvas pixel centre.
-     * Fits the stone cluster (plus 1-point padding) into the
-     * compact media slot, centred — Tobias-style mid-card graphic.
-     */
     function intersectionToXY(x, y) {
       var pad = Math.min(cssW, cssH) * 0.08;
       var availW = cssW - pad * 2;
@@ -259,7 +333,6 @@
       if (color === 'W') {
         ctx.fillStyle = '#f2f2f2';
         ctx.fill();
-        // Hairline rim so white stones read on pale greens
         ctx.strokeStyle = 'rgba(0,0,0,0.18)';
         ctx.lineWidth = Math.max(1, radius * 0.06);
         ctx.stroke();
@@ -271,49 +344,156 @@
       ctx.restore();
     }
 
-    function drawFrame(now) {
-      ctx.clearRect(0, 0, cssW, cssH);
+    function placeStone(x, y, color, appearAt, durationIn) {
+      stoneInstances.push({
+        x: x,
+        y: y,
+        color: color,
+        appearAt: appearAt,
+        durationIn: durationIn,
+        removeAt: null,
+        durationOut: 0,
+      });
+    }
 
-      if (!started) {
-        // Reduced motion: show final position immediately
-        if (prefersReducedMotion) {
-          stones.forEach(function (s) {
-            var p = intersectionToXY(s.x, s.y);
-            drawStone(p.cx, p.cy, p.radius, s.color, 1);
-          });
+    function scheduleCapture(x, y, removeAt, durationOut) {
+      // Remove the living stone currently at this intersection
+      for (var i = stoneInstances.length - 1; i >= 0; i--) {
+        var s = stoneInstances[i];
+        if (
+          s.x === x &&
+          s.y === y &&
+          s.removeAt == null &&
+          s.appearAt < removeAt
+        ) {
+          s.removeAt = removeAt;
+          s.durationOut = durationOut;
           return;
+        }
+      }
+    }
+
+    /**
+     * Build absolute timeline into stoneInstances.
+     * Returns total animation length in ms.
+     */
+    function buildTimeline() {
+      stoneInstances = [];
+      var t = 0;
+
+      if (isSimple) {
+        pattern.stones.forEach(function (s, i) {
+          placeStone(s.x, s.y, s.color, i * stoneDelay, stoneDuration);
+        });
+        t = (pattern.stones.length - 1) * stoneDelay + stoneDuration;
+        timelineBuilt = true;
+        return t;
+      }
+
+      // --- Tsumego ---
+      var setupJitter = pattern.setupJitter != null ? pattern.setupJitter : 50;
+      var setupDuration = pattern.setupDuration != null ? pattern.setupDuration : 200;
+      var thinkPause = pattern.thinkPause != null ? pattern.thinkPause : 4000;
+      var captureDelay = pattern.captureDelay != null ? pattern.captureDelay : 100;
+      var captureDuration = pattern.captureDuration != null ? pattern.captureDuration : 160;
+
+      // Randomised near-simultaneous rush
+      var setupOrder = shuffled(pattern.setup);
+      var maxSetupAppear = 0;
+      setupOrder.forEach(function (s) {
+        var appearAt = Math.random() * setupJitter;
+        if (appearAt > maxSetupAppear) maxSetupAppear = appearAt;
+        placeStone(s.x, s.y, s.color, appearAt, setupDuration);
+      });
+
+      // Think pause starts once the last setup stone has finished popping in
+      var solutionStart = maxSetupAppear + setupDuration + thinkPause;
+      t = solutionStart;
+
+      pattern.moves.forEach(function (move, i) {
+        var appearAt = solutionStart + i * stoneDelay;
+        placeStone(move.x, move.y, move.color, appearAt, stoneDuration);
+
+        var moveEnd = appearAt + stoneDuration;
+        if (moveEnd > t) t = moveEnd;
+
+        if (move.captures && move.captures.length) {
+          // Removals fire shortly after the capturing stone is placed
+          var removeAt = appearAt + captureDelay;
+          move.captures.forEach(function (c) {
+            scheduleCapture(c.x, c.y, removeAt, captureDuration);
+            var remEnd = removeAt + captureDuration;
+            if (remEnd > t) t = remEnd;
+          });
+        }
+      });
+
+      timelineBuilt = true;
+      return t;
+    }
+
+    function scaleForStone(stone, elapsed) {
+      if (elapsed < stone.appearAt) return 0;
+      var inT = (elapsed - stone.appearAt) / stone.durationIn;
+      var scale = inT >= 1 ? 1 : easeOutCubic(Math.max(0, inT));
+
+      if (stone.removeAt != null && elapsed >= stone.removeAt) {
+        var outT = (elapsed - stone.removeAt) / stone.durationOut;
+        if (outT >= 1) return 0;
+        scale *= 1 - easeInCubic(Math.max(0, outT));
+      }
+      return scale;
+    }
+
+    function drawBoardAt(elapsed) {
+      ctx.clearRect(0, 0, cssW, cssH);
+      stoneInstances.forEach(function (stone) {
+        var scale = scaleForStone(stone, elapsed);
+        if (scale <= 0) return;
+        var pos = intersectionToXY(stone.x, stone.y);
+        drawStone(pos.cx, pos.cy, pos.radius, stone.color, scale);
+      });
+    }
+
+    function finalElapsed() {
+      return 1e9;
+    }
+
+    function drawReducedMotion() {
+      // Show the problem position (setup only) — the tsumego itself
+      stoneInstances = [];
+      if (isTsumego) {
+        pattern.setup.forEach(function (s) {
+          placeStone(s.x, s.y, s.color, 0, 1);
+        });
+      } else {
+        pattern.stones.forEach(function (s) {
+          placeStone(s.x, s.y, s.color, 0, 1);
+        });
+      }
+      drawBoardAt(finalElapsed());
+      settled = true;
+      timelineBuilt = true;
+    }
+
+    var totalMs = 0;
+
+    function drawFrame(now) {
+      if (!started) {
+        if (prefersReducedMotion) {
+          drawReducedMotion();
         }
         return;
       }
 
       var elapsed = now - startTime;
+      drawBoardAt(elapsed);
 
-      for (var i = 0; i < stones.length; i++) {
-        var appearAt = i * stoneDelay;
-        var t = (elapsed - appearAt) / stoneDuration;
-
-        if (t < 0) {
-          progress[i] = -1;
-          continue;
-        }
-        progress[i] = Math.min(1, t);
-
-        var s = stones[i];
-        var pos = intersectionToXY(s.x, s.y);
-        var scale = easeOutCubic(progress[i]);
-        drawStone(pos.cx, pos.cy, pos.radius, s.color, scale);
-      }
-
-      var totalMs = (stones.length - 1) * stoneDelay + stoneDuration;
       if (elapsed < totalMs) {
         rafId = requestAnimationFrame(drawFrame);
       } else {
-        // Final settled frame
-        ctx.clearRect(0, 0, cssW, cssH);
-        stones.forEach(function (s) {
-          var p = intersectionToXY(s.x, s.y);
-          drawStone(p.cx, p.cy, p.radius, s.color, 1);
-        });
+        drawBoardAt(finalElapsed());
+        settled = true;
         rafId = null;
       }
     }
@@ -321,7 +501,13 @@
     function start() {
       if (started) return;
       started = true;
+      if (prefersReducedMotion) {
+        drawReducedMotion();
+        return;
+      }
+      totalMs = buildTimeline();
       startTime = performance.now();
+      settled = false;
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(drawFrame);
     }
@@ -329,16 +515,14 @@
     resize();
 
     if (prefersReducedMotion) {
-      drawFrame(performance.now());
+      drawReducedMotion();
     }
 
-    // Start when the card scrolls into view (after reveal stagger)
     if ('IntersectionObserver' in window) {
       var goObserver = new IntersectionObserver(
         function (entries) {
           entries.forEach(function (entry) {
             if (entry.isIntersecting) {
-              // Wait for cardReveal stagger (~same as card index * 80 + a beat)
               var gridCards = Array.from(
                 card.parentElement.querySelectorAll('.card')
               );
@@ -361,15 +545,10 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function () {
         resize();
-        // Redraw settled or in-progress state
-        if (prefersReducedMotion || (started && rafId === null)) {
-          ctx.clearRect(0, 0, cssW, cssH);
-          stones.forEach(function (s) {
-            var p = intersectionToXY(s.x, s.y);
-            drawStone(p.cx, p.cy, p.radius, s.color, 1);
-          });
+        if (!timelineBuilt && !settled) return;
+        if (prefersReducedMotion || settled) {
+          drawBoardAt(finalElapsed());
         } else if (started) {
-          // Restart frame loop from current clock so mid-animation resizes cleanly
           if (rafId) cancelAnimationFrame(rafId);
           rafId = requestAnimationFrame(drawFrame);
         }
