@@ -32,12 +32,10 @@ besogo.makeBoardDisplay = function(container, editor) {
         tetherAimSvgY = 0,
         tetherOffsetX = 0,
         tetherOffsetY = 0,
-        tetherPressX = 0,
-        tetherPressY = 0,
+        tetherStopRefX = 0,
+        tetherStopRefY = 0,
         tetherLastFingerX = 0,
         tetherLastFingerY = 0,
-        tetherLiftX = 0,
-        tetherLiftY = 0,
         holdTimer = null,
         stopDebounceTimer = null,
         pendingHold = null,
@@ -457,12 +455,11 @@ besogo.makeBoardDisplay = function(container, editor) {
         tetherAimJ = hold.aimJ;
         tetherAimSvgX = svgPos(tetherAimI);
         tetherAimSvgY = svgPos(tetherAimJ);
-        tetherPressX = hold.pressX;
-        tetherPressY = hold.pressY;
+        tetherStopRefX = cx;
+        tetherStopRefY = cy;
         tetherLastFingerX = cx;
         tetherLastFingerY = cy;
-        tetherLiftX = cx;
-        tetherLiftY = cy;
+        clearStopDebounce();
         showTetherGhostAtAim();
         tetherHapticPulse();
         if (svg.setPointerCapture) {
@@ -498,7 +495,7 @@ besogo.makeBoardDisplay = function(container, editor) {
     function updateWaitingControl(event) {
         showTetherGhostAtAim();
         if (!besogo.tetherMath.hasReachedStopDistance(
-                tetherPressX, tetherPressY, event.clientX, event.clientY, STOP_DISTANCE_PX)) {
+                tetherStopRefX, tetherStopRefY, event.clientX, event.clientY, STOP_DISTANCE_PX)) {
             tetherLastFingerX = event.clientX;
             tetherLastFingerY = event.clientY;
             clearStopDebounce();
