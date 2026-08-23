@@ -45,38 +45,62 @@
     flex: 0 0 auto;
   }
 
-  /* Phone nav row: large Back / Delete / Forward (+ jump start/end). */
+  /* Phone nav row: flat glyphs on the bar — no bevelled frames or captions (#22). */
   .goban-phone .besogo-control {
     flex-wrap: nowrap;
     justify-content: space-between;
-    gap: 6px;
-    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    gap: 4px;
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
     width: 100%;
     background: #eceae4;
     border-top: 1px solid #c8c4bc;
   }
 
-  .goban-phone .besogo-control button,
-  #goban-more-toggle {
+  .goban-phone .besogo-control button {
     min-width: 44px;
     min-height: 44px;
     height: 52px;
-    padding: 4px 6px;
+    width: auto;
+    padding: 0;
     flex: 1 1 0;
-    max-width: 80px;
+    max-width: 72px;
     display: inline-flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    font: 600 11px/1.2 system-ui, sans-serif;
+    background: transparent;
+    background-image: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    color: #111;
     touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  .goban-phone .besogo-control button:focus {
+    outline: none;
+  }
+
+  .goban-phone .besogo-control button:focus-visible {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+  }
+
+  .goban-phone .besogo-control button:active,
+  .goban-phone .besogo-control button:hover {
+    background: transparent;
+    box-shadow: none;
   }
 
   .goban-phone .besogo-control button svg {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
+    display: block;
+    pointer-events: none;
   }
 
   /* Hide jump-10 and sibling / style chrome from the primary row. */
@@ -84,18 +108,6 @@
   .goban-phone .besogo-control button:nth-child(6),
   .goban-phone .besogo-control button:nth-child(n+8):not(#goban-more-toggle) {
     display: none;
-  }
-
-  .goban-phone .besogo-control button:nth-child(1)::after { content: "Start"; }
-  .goban-phone .besogo-control button:nth-child(3)::after { content: "Back"; }
-  .goban-phone .besogo-control button:nth-child(4)::after { content: "Delete"; }
-  .goban-phone .besogo-control button:nth-child(5)::after { content: "Forward"; }
-  .goban-phone .besogo-control button:nth-child(7)::after { content: "End"; }
-
-  #goban-more-toggle {
-    flex: 0 0 auto;
-    max-width: 56px;
-    background: #d0d4ce;
   }
 
   #goban-drawer {
@@ -129,8 +141,7 @@
       justify-content: center;
     }
 
-    .goban-phone .besogo-control button,
-    #goban-more-toggle {
+    .goban-phone .besogo-control button {
       max-width: 64px;
     }
   }
@@ -177,6 +188,22 @@
   besogo.create(container, options);
   setupPhoneChrome(container);
 
+  function makeMoreIcon() {
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("aria-hidden", "true");
+    [22, 50, 78].forEach(function (cy) {
+      var dot = document.createElementNS(ns, "circle");
+      dot.setAttribute("cx", "50");
+      dot.setAttribute("cy", String(cy));
+      dot.setAttribute("r", "8");
+      dot.setAttribute("fill", "black");
+      svg.appendChild(dot);
+    });
+    return svg;
+  }
+
   function compactPhoneLayout(root) {
     var panels = root.querySelector(".besogo-panels");
     var board = root.querySelector(".besogo-board");
@@ -214,17 +241,18 @@
     var moreBtn = document.createElement("button");
     moreBtn.id = "goban-more-toggle";
     moreBtn.type = "button";
-    moreBtn.textContent = "More";
     moreBtn.setAttribute("aria-expanded", "false");
     moreBtn.setAttribute("aria-controls", "goban-drawer");
+    moreBtn.setAttribute("aria-label", "More");
     moreBtn.title = "Tools, tree, file, and game info";
+    moreBtn.appendChild(makeMoreIcon());
     if (control) control.appendChild(moreBtn);
 
     moreBtn.addEventListener("click", function () {
       var open = document.body.classList.toggle("goban-more-open");
       drawer.setAttribute("aria-hidden", open ? "false" : "true");
       moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
-      moreBtn.textContent = open ? "Less" : "More";
+      moreBtn.setAttribute("aria-label", open ? "Hide extra panels" : "More");
       compactPhoneLayout(root);
     });
 

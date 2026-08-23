@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-globals */
-// CACHE_VERSION: 2 — bump when demo shell or cached assets change.
+// CACHE_VERSION: 3 — bump when demo shell or cached assets change.
 'use strict';
 
-var CACHE_VERSION = 2;
+var CACHE_VERSION = 3;
 var CACHE_NAME = 'goban-demo-v' + CACHE_VERSION;
 
 // Paths relative to the demo/ scope (works for local serve and GitHub Pages).

@@ -134,6 +134,7 @@ besogo.makeControlPanel = function(container, editor) {
                 });
 
             button.title = tooltip;
+            button.setAttribute('aria-label', tooltip);
             button.onclick = action;
             button.appendChild(svg);
             svg.appendChild(element);
