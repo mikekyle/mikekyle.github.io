@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>goban_ui demo</title>
+<meta name="description" content="Phone-first Go board — BesoGo feel with BW-Go tether and delete-last.">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="goban">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="../vendor/besogo/icon32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="../vendor/besogo/icon192.png" sizes="192x192">
+<link rel="icon" href="../vendor/besogo/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../vendor/besogo/icon192.png">
+<link rel="stylesheet" href="../vendor/besogo/css/besogo.css">
+<link rel="stylesheet" href="../vendor/besogo/css/besogo-fill.css">
+<link rel="stylesheet" href="../vendor/besogo/css/board-flat.css">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #1a1a1a;
+  }
+
+  #target {
+    height: 100%;
+    width: 100%;
+  }
+
+  #target.besogo-container {
+    background: #1a1a1a;
+    justify-content: space-between;
+  }
+
+  .goban-phone .besogo-board {
+    flex: 0 0 auto;
+  }
+
+  .goban-phone .besogo-panels {
+    flex: 0 0 auto;
+  }
+
+  /* Phone nav row: large Back / Delete / Forward (+ jump start/end). */
+  .goban-phone .besogo-control {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    width: 100%;
+    background: #eceae4;
+    border-top: 1px solid #c8c4bc;
+  }
+
+  .goban-phone .besogo-control button,
+  #goban-more-toggle {
+    min-width: 44px;
+    min-height: 44px;
+    height: 52px;
+    padding: 4px 6px;
+    flex: 1 1 0;
+    max-width: 80px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font: 600 11px/1.2 system-ui, sans-serif;
+    touch-action: manipulation;
+  }
+
+  .goban-phone .besogo-control button svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  /* Hide jump-10 and sibling / style chrome from the primary row. */
+  .goban-phone .besogo-control button:nth-child(2),
+  .goban-phone .besogo-control button:nth-child(6),
+  .goban-phone .besogo-control button:nth-child(n+8):not(#goban-more-toggle) {
+    display: none;
+  }
+
+  .goban-phone .besogo-control button:nth-child(1)::after { content: "Start"; }
+  .goban-phone .besogo-control button:nth-child(3)::after { content: "Back"; }
+  .goban-phone .besogo-control button:nth-child(4)::after { content: "Delete"; }
+  .goban-phone .besogo-control button:nth-child(5)::after { content: "Forward"; }
+  .goban-phone .besogo-control button:nth-child(7)::after { content: "End"; }
+
+  #goban-more-toggle {
+    flex: 0 0 auto;
+    max-width: 56px;
+    background: #d0d4ce;
+  }
+
+  #goban-drawer {
+    display: none;
+  }
+
+  body.goban-more-open #goban-drawer {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: min(55vh, 420px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #f4f2ec;
+    border-top: 1px solid #b8b4ac;
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.18);
+    z-index: 30;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  body.goban-more-open #goban-drawer > * {
+    margin-bottom: 8px;
+  }
+
+  /* Landscape: keep side panel usable; drawer still overlays from the bottom. */
+  @media (orientation: landscape) and (min-height: 320px) {
+    .goban-phone .besogo-control {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .goban-phone .besogo-control button,
+    #goban-more-toggle {
+      max-width: 64px;
+    }
+  }
+</style>
+<script src="../vendor/besogo/js/besogo.js"></script>
+<script src="../src/tetherMath.js"></script>
+<script src="../vendor/besogo/js/editor.js"></script>
+<script src="../vendor/besogo/js/gameRoot.js"></script>
+<script src="../vendor/besogo/js/svgUtil.js"></script>
+<script src="../vendor/besogo/js/parseSgf.js"></script>
+<script src="../vendor/besogo/js/loadSgf.js"></script>
+<script src="../vendor/besogo/js/saveSgf.js"></script>
+<script src="../vendor/besogo/js/boardDisplay.js"></script>
+<script src="../vendor/besogo/js/coord.js"></script>
+<script src="../vendor/besogo/js/toolPanel.js"></script>
+<script src="../vendor/besogo/js/filePanel.js"></script>
+<script src="../vendor/besogo/js/controlPanel.js"></script>
+<script src="../vendor/besogo/js/namesPanel.js"></script>
+<script src="../vendor/besogo/js/commentPanel.js"></script>
+<script src="../vendor/besogo/js/treePanel.js"></script>
+</head>
+<body class="goban-phone">
+<div id="target" class="besogo-editor"></div>
+<script>
+(function () {
+  var options = {
+    resize: "fill",
+    size: "19",
+    coord: "western",
+    panels: "control+names+comment+tool+tree+file",
+    minpanelsheight: 64,
+    minpanelswidth: 220
+  };
+  var search = location.search.substring(1);
+  if (search) {
+    search.split("&").forEach(function (pair) {
+      var parts = pair.split("=");
+      var name = parts.shift();
+      if (name) options[name] = decodeURIComponent(parts.join("="));
+    });
+  }
+
+  var container = document.getElementById("target");
+  besogo.create(container, options);
+  setupPhoneChrome(container);
+
+  function compactPhoneLayout(root) {
+    var panels = root.querySelector(".besogo-panels");
+    var board = root.querySelector(".besogo-board");
+    var control = panels && panels.querySelector(".besogo-control");
+    if (!panels || !board || !control) return;
+
+    var w = root.clientWidth;
+    var h = root.clientHeight;
+    if (w >= h) return; // landscape: keep BesoGo fill side panel
+
+    var navH = control.offsetHeight || 64;
+    var boardSize = Math.min(w, h - navH);
+
+    board.style.width = w + "px";
+    board.style.height = boardSize + "px";
+    panels.style.height = navH + "px";
+    panels.style.width = w + "px";
+  }
+
+  function setupPhoneChrome(root) {
+    var panels = root.querySelector(".besogo-panels");
+    if (!panels) return;
+
+    var drawer = document.createElement("div");
+    drawer.id = "goban-drawer";
+    drawer.setAttribute("aria-hidden", "true");
+
+    ["names", "comment", "tool", "tree", "file"].forEach(function (name) {
+      var panel = panels.querySelector(".besogo-" + name);
+      if (panel) drawer.appendChild(panel);
+    });
+    panels.appendChild(drawer);
+
+    var control = panels.querySelector(".besogo-control");
+    var moreBtn = document.createElement("button");
+    moreBtn.id = "goban-more-toggle";
+    moreBtn.type = "button";
+    moreBtn.textContent = "More";
+    moreBtn.setAttribute("aria-expanded", "false");
+    moreBtn.setAttribute("aria-controls", "goban-drawer");
+    moreBtn.title = "Tools, tree, file, and game info";
+    if (control) control.appendChild(moreBtn);
+
+    moreBtn.addEventListener("click", function () {
+      var open = document.body.classList.toggle("goban-more-open");
+      drawer.setAttribute("aria-hidden", open ? "false" : "true");
+      moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      moreBtn.textContent = open ? "Less" : "More";
+      compactPhoneLayout(root);
+    });
+
+    window.addEventListener("resize", function () {
+      requestAnimationFrame(function () {
+        compactPhoneLayout(root);
+      });
+    });
+    compactPhoneLayout(root);
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (err) {
+        console.warn('Service worker registration failed:', err);
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

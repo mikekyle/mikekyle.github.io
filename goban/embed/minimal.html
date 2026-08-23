@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>goban_ui minimal embed</title>
+<link rel="stylesheet" href="../vendor/besogo/css/besogo.css">
+<link rel="stylesheet" href="../vendor/besogo/css/besogo-fill.css">
+<link rel="stylesheet" href="../vendor/besogo/css/board-flat.css">
+<style>html,body{margin:0;height:100%}#board{height:100%}</style>
+<script src="../vendor/besogo/js/besogo.js"></script>
+<script src="../src/tetherMath.js"></script>
+<script src="../vendor/besogo/js/editor.js"></script>
+<script src="../vendor/besogo/js/gameRoot.js"></script>
+<script src="../vendor/besogo/js/svgUtil.js"></script>
+<script src="../vendor/besogo/js/parseSgf.js"></script>
+<script src="../vendor/besogo/js/loadSgf.js"></script>
+<script src="../vendor/besogo/js/saveSgf.js"></script>
+<script src="../vendor/besogo/js/boardDisplay.js"></script>
+<script src="../vendor/besogo/js/coord.js"></script>
+<script src="../vendor/besogo/js/controlPanel.js"></script>
+</head>
+<body>
+<div id="board"></div>
+<script>
+var el = document.getElementById("board");
+besogo.create(el, { size: 19, panels: "control", tool: "auto", resize: "fill", coord: "western" });
+el.besogoEditor.addListener(function (msg) {
+  if (msg.stoneChange || msg.treeChange) console.log("board changed", el.besogoEditor.getCurrent());
+});
+</script>
+</body>
+</html>
