@@ -20,19 +20,34 @@ besogo.makeBoardDisplay = function(container, editor) {
 
         TOUCH_FLAG = false, // Flag for touch interfaces
 
-        // Tether placement (BW-Go press-drag-lift)
+        // Tether placement (BW-Go v2: tap + hold-haptic vector-offset)
         tetherGroup, // Group for tether ghost stone
         tetherGhost, // Current ghost element
         tetherActive = false,
+        tetherPhase = null, // 'waiting_control' | 'adjusting'
         tetherPointerId = null,
-        tetherTargetI = 0,
-        tetherTargetJ = 0,
+        tetherAimI = 0,
+        tetherAimJ = 0,
+        tetherAimSvgX = 0,
+        tetherAimSvgY = 0,
+        tetherOffsetX = 0,
+        tetherOffsetY = 0,
+        tetherPressX = 0,
+        tetherPressY = 0,
+        tetherLastFingerX = 0,
+        tetherLastFingerY = 0,
         tetherLiftX = 0,
         tetherLiftY = 0,
-        mouseDragPending = null,
+        holdTimer = null,
+        stopDebounceTimer = null,
+        pendingHold = null,
         suppressClick = false,
         LIFT_FILTER_PX = 8,
         MOUSE_DRAG_PX = 5,
+        HOLD_THRESHOLD_MS = 300,
+        STOP_DISTANCE_PX = 96,
+        STOP_MOVEMENT_PX = 4,
+        STOP_DEBOUNCE_MS = 100,
         RETARGET_HYSTERESIS = 0.35;
 
     initializeBoard(editor.getCoordStyle()); // Initialize SVG element and draw the board
@@ -285,7 +300,7 @@ besogo.makeBoardDisplay = function(container, editor) {
 
     function handleClick(i, j) { // Returns function for click handling
         return function(event) {
-            if (suppressClick || (TOUCH_FLAG && usesTetherPlacement())) {
+            if (suppressClick) {
                 event.preventDefault();
                 return;
             }
@@ -345,20 +360,6 @@ besogo.makeBoardDisplay = function(container, editor) {
         return current.nextMove();
     }
 
-    function ghostDisplayPos(i, j, clientX, clientY) {
-        if (clientX === undefined) {
-            return besogo.tetherMath.ghostDisplayPosFromSvg(i, j, undefined, undefined, sizeX, sizeY, {
-                cellSize: CELL_SIZE,
-                boardMargin: BOARD_MARGIN
-            });
-        }
-        var finger = clientToSvg(clientX, clientY);
-        return besogo.tetherMath.ghostDisplayPosFromSvg(i, j, finger.x, finger.y, sizeX, sizeY, {
-            cellSize: CELL_SIZE,
-            boardMargin: BOARD_MARGIN
-        });
-    }
-
     function clearTetherGhost() {
         while (tetherGroup.firstChild) {
             tetherGroup.removeChild(tetherGroup.firstChild);
@@ -366,52 +367,186 @@ besogo.makeBoardDisplay = function(container, editor) {
         tetherGhost = null;
     }
 
-    function showTetherGhost(i, j, clientX, clientY) {
-        var pos = ghostDisplayPos(i, j, clientX, clientY),
-            color = getTetherStoneColor();
+    function clearHoldTimer() {
+        if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
+        }
+    }
+
+    function clearStopDebounce() {
+        if (stopDebounceTimer) {
+            clearTimeout(stopDebounceTimer);
+            stopDebounceTimer = null;
+        }
+    }
+
+    function showTetherGhostAtSvg(svgX, svgY) {
+        var color = getTetherStoneColor();
         clearTetherGhost();
-        tetherGhost = besogo.svgStone(pos.x, pos.y, color);
+        tetherGhost = besogo.svgStone(svgX, svgY, color);
         tetherGhost.setAttribute('opacity', '0.65');
         tetherGroup.appendChild(tetherGhost);
     }
 
-    function cancelTether() {
+    function showTetherGhostAtAim() {
+        showTetherGhostAtSvg(tetherAimSvgX, tetherAimSvgY);
+    }
+
+    function tetherHapticPulse() {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(30);
+        } else if (tetherGhost) {
+            tetherGhost.setAttribute('opacity', '0.95');
+            setTimeout(function () {
+                if (tetherGhost) {
+                    tetherGhost.setAttribute('opacity', '0.65');
+                }
+            }, 120);
+        }
+    }
+
+    function resetTetherState() {
+        clearHoldTimer();
+        clearStopDebounce();
         tetherActive = false;
+        tetherPhase = null;
         tetherPointerId = null;
+        pendingHold = null;
         clearTetherGhost();
     }
 
-    function startTether(event) {
-        var target = nearestIntersection(event.clientX, event.clientY);
-        if (!target) {
+    function cancelTether() {
+        resetTetherState();
+    }
+
+    function scheduleHoldArm(event, target) {
+        clearHoldTimer();
+        pendingHold = {
+            id: event.pointerId,
+            pressX: event.clientX,
+            pressY: event.clientY,
+            aimI: target.i,
+            aimJ: target.j,
+            lastX: event.clientX,
+            lastY: event.clientY
+        };
+        holdTimer = setTimeout(function () {
+            holdTimer = null;
+            if (!pendingHold) {
+                return;
+            }
+            armTether(null);
+        }, HOLD_THRESHOLD_MS);
+    }
+
+    function armTether(event) {
+        var hold = pendingHold,
+            cx, cy, pid;
+        if (!hold) {
             return;
         }
+        pendingHold = null;
+        pid = hold.id;
+        cx = event ? event.clientX : hold.lastX;
+        cy = event ? event.clientY : hold.lastY;
         tetherActive = true;
-        tetherPointerId = event.pointerId;
-        tetherTargetI = target.i;
-        tetherTargetJ = target.j;
-        tetherLiftX = event.clientX;
-        tetherLiftY = event.clientY;
-        showTetherGhost(tetherTargetI, tetherTargetJ, event.clientX, event.clientY);
+        tetherPhase = 'waiting_control';
+        tetherPointerId = pid;
+        tetherAimI = hold.aimI;
+        tetherAimJ = hold.aimJ;
+        tetherAimSvgX = svgPos(tetherAimI);
+        tetherAimSvgY = svgPos(tetherAimJ);
+        tetherPressX = hold.pressX;
+        tetherPressY = hold.pressY;
+        tetherLastFingerX = cx;
+        tetherLastFingerY = cy;
+        tetherLiftX = cx;
+        tetherLiftY = cy;
+        showTetherGhostAtAim();
+        tetherHapticPulse();
         if (svg.setPointerCapture) {
-            svg.setPointerCapture(event.pointerId);
+            try {
+                svg.setPointerCapture(pid);
+            } catch (ignore) {}
         }
+    }
+
+    function lockControlPointAt(clientX, clientY) {
+        var finger = clientToSvg(clientX, clientY),
+            offset = besogo.tetherMath.fingerStoneOffset(
+                tetherAimSvgX, tetherAimSvgY, finger.x, finger.y);
+        tetherOffsetX = offset.offsetX;
+        tetherOffsetY = offset.offsetY;
+        tetherPhase = 'adjusting';
+        updateAdjustingGhostAt(clientX, clientY);
+    }
+
+    function scheduleControlLock() {
+        if (stopDebounceTimer) {
+            return;
+        }
+        stopDebounceTimer = setTimeout(function () {
+            stopDebounceTimer = null;
+            if (!tetherActive || tetherPhase !== 'waiting_control') {
+                return;
+            }
+            lockControlPointAt(tetherLastFingerX, tetherLastFingerY);
+        }, STOP_DEBOUNCE_MS);
+    }
+
+    function updateWaitingControl(event) {
+        showTetherGhostAtAim();
+        if (!besogo.tetherMath.hasReachedStopDistance(
+                tetherPressX, tetherPressY, event.clientX, event.clientY, STOP_DISTANCE_PX)) {
+            tetherLastFingerX = event.clientX;
+            tetherLastFingerY = event.clientY;
+            clearStopDebounce();
+            return;
+        }
+        if (besogo.tetherMath.isMovementBelowThreshold(
+                event.clientX - tetherLastFingerX,
+                event.clientY - tetherLastFingerY,
+                STOP_MOVEMENT_PX)) {
+            scheduleControlLock();
+        } else {
+            clearStopDebounce();
+        }
+        tetherLastFingerX = event.clientX;
+        tetherLastFingerY = event.clientY;
+    }
+
+    function updateAdjustingGhostAt(clientX, clientY) {
+        var finger = clientToSvg(clientX, clientY),
+            pos = besogo.tetherMath.ghostPosFromOffset(
+                finger.x, finger.y, tetherOffsetX, tetherOffsetY);
+        showTetherGhostAtSvg(pos.x, pos.y);
+    }
+
+    function updateAdjustingGhost(event) {
+        updateAdjustingGhostAt(event.clientX, event.clientY);
     }
 
     function updateTether(event) {
-        var target = nearestIntersection(event.clientX, event.clientY,
-            tetherTargetI, tetherTargetJ);
-        if (!target) {
-            cancelTether();
-            return;
+        if (tetherPhase === 'waiting_control') {
+            updateWaitingControl(event);
+        } else if (tetherPhase === 'adjusting') {
+            updateAdjustingGhost(event);
         }
-        tetherTargetI = target.i;
-        tetherTargetJ = target.j;
-        showTetherGhost(tetherTargetI, tetherTargetJ, event.clientX, event.clientY);
+    }
+
+    function commitTetherPlacement(i, j) {
+        if (i && j) {
+            suppressClick = true;
+            editor.click(i, j, false, false);
+            setTimeout(function () { suppressClick = false; }, 0);
+        }
     }
 
     function endTether(event) {
-        var dx, dy, i, j;
+        var finger, ghostPos, commit, i, j;
+
+        suppressClick = true;
 
         if (svg.releasePointerCapture) {
             try {
@@ -419,21 +554,27 @@ besogo.makeBoardDisplay = function(container, editor) {
             } catch (ignore) {}
         }
 
-        dx = event.clientX - tetherLiftX;
-        dy = event.clientY - tetherLiftY;
-        if (besogo.tetherMath.isLiftTwitch(dx, dy, LIFT_FILTER_PX)) {
-            // Keep tetherTargetI/J — filter involuntary lift twitch
+        if (tetherPhase === 'adjusting') {
+            finger = clientToSvg(event.clientX, event.clientY);
+            ghostPos = besogo.tetherMath.ghostPosFromOffset(
+                finger.x, finger.y, tetherOffsetX, tetherOffsetY);
+            commit = besogo.tetherMath.commitIntersectionFromGhostSvg(
+                ghostPos.x, ghostPos.y, sizeX, sizeY, {
+                    cellSize: CELL_SIZE,
+                    boardMargin: BOARD_MARGIN,
+                    hasStone: function (ii, jj) {
+                        return !!editor.getCurrent().getStone(ii, jj);
+                    }
+                });
+            i = commit ? commit.i : tetherAimI;
+            j = commit ? commit.j : tetherAimJ;
+        } else {
+            i = tetherAimI;
+            j = tetherAimJ;
         }
 
-        i = tetherTargetI;
-        j = tetherTargetJ;
-        cancelTether();
-
-        if (i && j) {
-            suppressClick = true;
-            editor.click(i, j, false, false);
-            setTimeout(function() { suppressClick = false; }, 0);
-        }
+        resetTetherState();
+        commitTetherPlacement(i, j);
     }
 
     function onTetherPointerDown(event) {
@@ -444,15 +585,13 @@ besogo.makeBoardDisplay = function(container, editor) {
             cancelTether();
             return;
         }
-        if (event.pointerType === 'touch' || event.pointerType === 'pen') {
-            startTether(event);
-            event.preventDefault();
-        } else if (event.pointerType === 'mouse' && event.button === 0) {
-            mouseDragPending = {
-                id: event.pointerId,
-                x: event.clientX,
-                y: event.clientY
-            };
+        var target = nearestIntersection(event.clientX, event.clientY);
+        if (!target) {
+            return;
+        }
+        if (event.pointerType === 'touch' || event.pointerType === 'pen' ||
+                (event.pointerType === 'mouse' && event.button === 0)) {
+            scheduleHoldArm(event, target);
         }
     }
 
@@ -462,14 +601,22 @@ besogo.makeBoardDisplay = function(container, editor) {
             event.preventDefault();
             return;
         }
-        if (mouseDragPending && event.pointerId === mouseDragPending.id) {
-            var dx = event.clientX - mouseDragPending.x,
-                dy = event.clientY - mouseDragPending.y;
-            if (dx * dx + dy * dy > MOUSE_DRAG_PX * MOUSE_DRAG_PX) {
-                startTether(event);
-                mouseDragPending = null;
+        if (pendingHold && event.pointerId === pendingHold.id) {
+            var pdx = event.clientX - pendingHold.pressX,
+                pdy = event.clientY - pendingHold.pressY;
+            if (event.pointerType === 'mouse' &&
+                    pdx * pdx + pdy * pdy > MOUSE_DRAG_PX * MOUSE_DRAG_PX) {
+                clearHoldTimer();
+                armTether(event);
+                event.preventDefault();
+                return;
+            }
+            pendingHold.lastX = event.clientX;
+            pendingHold.lastY = event.clientY;
+            if (holdTimer) {
                 event.preventDefault();
             }
+            return;
         }
     }
 
@@ -477,15 +624,23 @@ besogo.makeBoardDisplay = function(container, editor) {
         if (tetherActive && event.pointerId === tetherPointerId) {
             endTether(event);
             event.preventDefault();
+            return;
         }
-        mouseDragPending = null;
+        if (pendingHold && event.pointerId === pendingHold.id) {
+            clearHoldTimer();
+            pendingHold = null;
+            // Quick tap: click handler on the rect fires after pointerup.
+        }
     }
 
     function onTetherPointerCancel(event) {
         if (tetherActive && event.pointerId === tetherPointerId) {
             cancelTether();
         }
-        mouseDragPending = null;
+        if (pendingHold && event.pointerId === pendingHold.id) {
+            clearHoldTimer();
+            pendingHold = null;
+        }
     }
     function handleOver(i, j) { // Returns function for mouse over
         return function() {
