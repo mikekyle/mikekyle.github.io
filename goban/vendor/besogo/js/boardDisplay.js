@@ -312,7 +312,7 @@ besogo.makeBoardDisplay = function(container, editor) {
 
     function usesTetherPlacement() {
         var tool = editor.getTool();
-        return tool === 'auto' || tool === 'playB' || tool === 'playW';
+        return tool === 'auto' || tool === 'playB' || tool === 'playW' || tool === 'relocate';
     }
 
     function setupTether() {
@@ -354,6 +354,9 @@ besogo.makeBoardDisplay = function(container, editor) {
         }
         if (tool === 'playW') {
             return 1;
+        }
+        if (tool === 'relocate' && current.move && current.move.color) {
+            return current.move.color;
         }
         return current.nextMove();
     }

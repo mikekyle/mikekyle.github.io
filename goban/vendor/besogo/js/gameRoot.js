@@ -25,6 +25,14 @@ besogo.makeGameRoot = function(sizeX, sizeY) {
     // Plays a move, returns true if successful
     // Set allow to truthy to allow overwrite, suicide and ko
     root.playMove = function(x, y, color, allow) {
+        if (!this.isMutable('move')) {
+            return false; // Move fails if node is immutable
+        }
+        return applyMove(this, x, y, color, allow);
+    }; // END func root.playMove
+
+    // Apply a move onto this node without the empty-leaf mutability check.
+    function applyMove(node, x, y, color, allow) {
         var captures = 0, // Number of captures made by this move
             overwrite = false, // Flags whether move overwrites a stone
             prevMove, // Previous move for ko check
@@ -32,34 +40,30 @@ besogo.makeGameRoot = function(sizeX, sizeY) {
             pending, // Pending capture locations
             i; // Scratch iteration variable
 
-        if (!this.isMutable('move')) {
-            return false; // Move fails if node is immutable
-        }
-
         if (!color) { // Falsy color indicates auto-color
-            color = this.nextMove();
+            color = node.nextMove();
         }
 
         if (x < 1 || y < 1 || x > sizeX || y > sizeY) {
-            this.move = { // Register as pass move if out of bounds
+            node.move = { // Register as pass move if out of bounds
                 x: 0, y: 0, // Log pass as position (0, 0)
                 color: color,
                 captures: 0, // Pass never captures
                 overwrite: false // Pass is never an overwrite
             };
-            this.lastMove = color; // Store color of last move
-            this.moveNumber++; // Increment move number
+            node.lastMove = color; // Store color of last move
+            node.moveNumber++; // Increment move number
             return true; // Pass move successful
         }
 
-        if (this.getStone(x, y)) { // Check for overwrite
+        if (node.getStone(x, y)) { // Check for overwrite
             if (!allow) {
                 return false; // Reject overwrite move if not allowed
             }
             overwrite = true; // Otherwise, flag overwrite and proceed
         }
 
-        testBoard = Object.create(this); // Copy board state (no need to initialize)
+        testBoard = Object.create(node); // Copy board state (no need to initialize)
         pending = []; // Initialize pending capture array
 
         setStone(testBoard, x, y, color); // Place the move stone
@@ -72,7 +76,7 @@ besogo.makeGameRoot = function(sizeX, sizeY) {
 
         captures = pending.length; // Capture count
 
-        prevMove = this.parent ? this.parent.move : null; // Previous move played
+        prevMove = node.parent ? node.parent.move : null; // Previous move played
         if (!allow && prevMove && // If previous move exists, ...
             prevMove.color === -color && // was of the opposite color, ...
             prevMove.overwrite === false && // not an overwrite, ...
@@ -91,26 +95,100 @@ besogo.makeGameRoot = function(sizeX, sizeY) {
         }
 
         if (color * captures < 0) { // Capture by black or suicide by white
-            this.blackCaps += Math.abs(captures); // Tally captures for black
+            node.blackCaps += Math.abs(captures); // Tally captures for black
         } else { // Capture by white or suicide by black
-            this.whiteCaps += Math.abs(captures); // Tally captures for white
+            node.whiteCaps += Math.abs(captures); // Tally captures for white
         }
 
-        setStone(this, x, y, color); // Place the stone
+        setStone(node, x, y, color); // Place the stone
         for (i = 0; i < pending.length; i++) { // Remove the captures
-            setStone(this, pending[i].x, pending[i].y, EMPTY);
+            setStone(node, pending[i].x, pending[i].y, EMPTY);
         }
 
-        this.move = { // Log the move
+        node.move = { // Log the move
             x: x, y: y,
             color: color,
             captures: captures,
             overwrite: overwrite
         };
-        this.lastMove = color; // Store color of last move
-        this.moveNumber++; // Increment move number
+        node.lastMove = color; // Store color of last move
+        node.moveNumber++; // Increment move number
         return true;
-    }; // END func root.playMove
+    } // END func applyMove
+
+    function clearLocalBoard(node) {
+        Object.keys(node).forEach(function (key) {
+            if (key.indexOf('board') === 0) {
+                delete node[key];
+            }
+        });
+        ['lastMove', 'moveNumber', 'blackCaps', 'whiteCaps'].forEach(function (key) {
+            if (Object.prototype.hasOwnProperty.call(node, key)) {
+                delete node[key];
+            }
+        });
+    }
+
+    function collectSetupAbs(node) {
+        var list = [],
+            x, y;
+        for (x = 1; x <= sizeX; x++) {
+            for (y = 1; y <= sizeY; y++) {
+                if (node.setupStones[fromXY(x, y)]) {
+                    list.push({ x: x, y: y, color: node.getStone(x, y) });
+                }
+            }
+        }
+        return list;
+    }
+
+    function applySetupAbs(node, list) {
+        var i, item, prev;
+        for (i = 0; i < list.length; i++) {
+            item = list[i];
+            prev = (node.parent && node.parent.getStone(item.x, item.y)) || EMPTY;
+            setStone(node, item.x, item.y, item.color);
+            node.setupStones[fromXY(item.x, item.y)] = item.color - prev;
+        }
+    }
+
+    function replaySubtree(node, allow) {
+        var setups = collectSetupAbs(node),
+            i;
+        clearLocalBoard(node);
+        if (node.move) {
+            applyMove(node, node.move.x, node.move.y, node.move.color, allow);
+        }
+        applySetupAbs(node, setups);
+        for (i = 0; i < node.children.length; i++) {
+            replaySubtree(node.children[i], true);
+        }
+    }
+
+    // Change this node's move point and replay all descendants. Sequence coords stay.
+    root.relocateMove = function(x, y) {
+        var color, tester;
+        if (!this.move || this.move.x < 1 || this.move.y < 1 || !this.parent) {
+            return false;
+        }
+        if (x < 1 || y < 1 || x > sizeX || y > sizeY) {
+            return false;
+        }
+        color = this.move.color;
+        tester = this.parent.makeChild();
+        if (!tester.playMove(x, y, color, false)) {
+            return false;
+        }
+        this.move = {
+            x: x,
+            y: y,
+            color: color,
+            captures: 0,
+            overwrite: false
+        };
+        replaySubtree(this, false);
+        return true;
+    };
 
     // Check for and perform capture of opposite color chain at (x, y)
     function captureStones(board, x, y, color, captures) {

@@ -8,7 +8,7 @@ besogo.makeToolPanel = function(container, editor) {
     svg = makeButtonSVG('auto', 'Auto-play/navigate\n' +
         'crtl+click to force ko, suicide, overwrite\n' +
         'shift+click to jump to move'); // Auto-play/nav tool button
-    svg.appendChild(makeYinYang(0, 0));
+    svg.appendChild(besogo.svgYinYang(0, 0));
 
     // svg = makeButtonSVG('playB', 'Play black'); // Play black button
     // svg.appendChild(besogo.svgStone(0, 0, -1));
@@ -33,6 +33,9 @@ besogo.makeToolPanel = function(container, editor) {
     element.appendChild(besogo.svgStone(0, 0)); // Grey stone
     element.appendChild(besogo.svgCross(0, 0, besogo.RED)); // Red cross
     svg.appendChild(element);
+
+    svg = makeButtonSVG('relocate', 'Relocate current move\nkeeps later coordinates');
+    besogo.drawToolGlyph(svg, 'relocate');
 
     svg = makeButtonSVG('circle', 'Circle'); // Circle markup button
     svg.appendChild(besogo.svgCircle(0, 0, 'black'));
@@ -158,33 +161,4 @@ besogo.makeToolPanel = function(container, editor) {
         }
     }
 
-    // Draws a yin yang
-    function makeYinYang(x, y) {
-        var element = besogo.svgEl('g');
-
-        // Draw black half circle on right side
-        element.appendChild( besogo.svgEl("path", {
-            d: "m" + x + "," + (y - 44) + " a44 44 0 0 1 0,88z",
-            stroke: "none",
-            fill: "black"
-        }));
-
-        // Draw white part of ying yang on left side
-        element.appendChild( besogo.svgEl("path", {
-            d: "m" + x + "," + (y + 44) + "a44 44 0 0 1 0,-88a22 22 0 0 1 0,44z",
-            stroke: "none",
-            fill: "white"
-        }));
-
-        // Draw round part of black half of ying yang
-        element.appendChild( besogo.svgEl("circle", {
-            cx: x,
-            cy: y + 22,
-            r: 22,
-            stroke: "none",
-            fill: "black"
-        }));
-
-        return element;
-    }
 };

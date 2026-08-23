@@ -20,7 +20,8 @@ besogo.makeEditor = function(sizeX, sizeY) {
             'triangle', // triangle markup
             'cross', // "X" cross markup
             'block', // filled square markup
-            'label'], // label markup
+            'label', // label markup
+            'relocate'], // move the current node's stone, keep later coords
         tool = 'auto', // Currently active tool (default: auto-mode)
         label = "1", // Next label that will be applied
 
@@ -60,6 +61,7 @@ besogo.makeEditor = function(sizeX, sizeY) {
         setCurrent: setCurrent,
         cutCurrent: cutCurrent,
         deleteCurrent: deleteCurrent,
+        relocateCurrent: relocateCurrent,
         promote: promote,
         demote: demote,
         getRoot: getRoot,
@@ -395,7 +397,22 @@ besogo.makeEditor = function(sizeX, sizeY) {
             case 'label':
                 setMarkup(i, j, label);
                 break;
+            case 'relocate':
+                relocateCurrent(i, j);
+                break;
         }
+    }
+
+    // Move the current node's stone; later nodes keep their coordinates (issue #24).
+    function relocateCurrent(i, j) {
+        if (i < 1 || j < 1) {
+            return false;
+        }
+        if (!current.relocateMove(i, j)) {
+            return false;
+        }
+        notifyListeners({ treeChange: true, stoneChange: true });
+        return true;
     }
 
     // Navigates to child with move at (x, y), searching tree if shift key pressed

@@ -207,4 +207,117 @@ besogo.svgLabel = function(x, y, color, label) {
     return element;
 };
 
+// Yin-yang used for the auto-play tool (shared with the phone mode menu).
+besogo.svgYinYang = function(x, y) {
+    var element = besogo.svgEl('g');
+
+    element.appendChild(besogo.svgEl("path", {
+        d: "m" + x + "," + (y - 44) + " a44 44 0 0 1 0,88z",
+        stroke: "none",
+        fill: "black"
+    }));
+    element.appendChild(besogo.svgEl("path", {
+        d: "m" + x + "," + (y + 44) + "a44 44 0 0 1 0,-88a22 22 0 0 1 0,44z",
+        stroke: "none",
+        fill: "white"
+    }));
+    element.appendChild(besogo.svgEl("circle", {
+        cx: x,
+        cy: y + 22,
+        r: 22,
+        stroke: "none",
+        fill: "black"
+    }));
+    return element;
+};
+
+// Browse / navOnly glyph.
+besogo.svgEye = function(x, y) {
+    var element = besogo.svgEl('g');
+    element.appendChild(besogo.svgEl('ellipse', {
+        cx: x,
+        cy: y,
+        rx: 40,
+        ry: 22,
+        stroke: 'black',
+        'stroke-width': 6,
+        fill: 'none'
+    }));
+    element.appendChild(besogo.svgEl('circle', {
+        cx: x,
+        cy: y,
+        r: 12,
+        stroke: 'none',
+        fill: 'black'
+    }));
+    return element;
+};
+
+// Append a tool glyph into an SVG whose viewBox is centered on (0, 0).
+besogo.drawToolGlyph = function(svg, tool) {
+    var element = besogo.svgEl('g');
+
+    switch (tool) {
+        case 'navOnly':
+            element.appendChild(besogo.svgEye(0, 0));
+            break;
+        case 'addB':
+            element.appendChild(besogo.svgStone(0, 0, -1));
+            break;
+        case 'addW':
+            element.appendChild(besogo.svgStone(0, 0, 1));
+            break;
+        case 'addE':
+            element.appendChild(besogo.svgStone(0, 0));
+            element.appendChild(besogo.svgCross(0, 0, besogo.RED));
+            break;
+        case 'circle':
+            element.appendChild(besogo.svgCircle(0, 0, 'black'));
+            break;
+        case 'square':
+            element.appendChild(besogo.svgSquare(0, 0, 'black'));
+            break;
+        case 'triangle':
+            element.appendChild(besogo.svgTriangle(0, 0, 'black'));
+            break;
+        case 'cross':
+            element.appendChild(besogo.svgCross(0, 0, 'black'));
+            break;
+        case 'block':
+            element.appendChild(besogo.svgBlock(0, 0, 'black'));
+            break;
+        case 'clrMark':
+            element.appendChild(besogo.svgTriangle(0, 0, besogo.GREY));
+            element.appendChild(besogo.svgCross(0, 0, besogo.RED));
+            break;
+        case 'label':
+            element.appendChild(besogo.svgLabel(0, 0, 'black', 'A1'));
+            break;
+        case 'pass':
+            element.appendChild(besogo.svgLabel(0, 0, 'black', 'P'));
+            break;
+        case 'relocate':
+            element.appendChild(besogo.svgEl('line', {
+                x1: 0, y1: -36, x2: 0, y2: 36,
+                stroke: 'black', 'stroke-width': 6
+            }));
+            element.appendChild(besogo.svgEl('polygon', {
+                points: '-44,0 -14,-16 -14,16',
+                stroke: 'none',
+                fill: 'black'
+            }));
+            element.appendChild(besogo.svgEl('polygon', {
+                points: '44,0 14,-16 14,16',
+                stroke: 'none',
+                fill: 'black'
+            }));
+            break;
+        default:
+            element.appendChild(besogo.svgYinYang(0, 0));
+            break;
+    }
+    svg.appendChild(element);
+    return element;
+};
+
 })(); // END closure
