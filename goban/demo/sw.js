@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-globals */
-// CACHE_VERSION: 6 — bump when demo shell or cached assets change.
+// CACHE_VERSION: 7 — bump when demo shell or cached assets change.
 'use strict';
 
-var CACHE_VERSION = 6;
+var CACHE_VERSION = 7;
 var CACHE_NAME = 'goban-demo-v' + CACHE_VERSION;
 
 // Paths relative to the demo/ scope (works for local serve and GitHub Pages).
@@ -11,6 +11,8 @@ var PRECACHE = [
     'manifest.json',
     '../src/tetherMath.js',
     '../src/modeMenu.js',
+    '../src/fileActions.js',
+    '../src/moreMenu.js',
     '../vendor/besogo/css/besogo.css',
     '../vendor/besogo/css/besogo-fill.css',
     '../vendor/besogo/css/board-flat.css',

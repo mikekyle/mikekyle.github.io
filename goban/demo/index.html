@@ -208,31 +208,123 @@
     touch-action: manipulation;
   }
 
-  #goban-drawer {
+  #goban-more-backdrop {
     display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(0, 0, 0, 0.25);
   }
 
-  body.goban-more-open #goban-drawer {
+  body.goban-more-menu-open #goban-more-backdrop {
     display: block;
+  }
+
+  #goban-more-menu {
+    display: none;
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    z-index: 41;
+    max-height: min(50vh, 380px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    padding: 4px 0;
+  }
+
+  body.goban-more-menu-open #goban-more-menu {
+    display: block;
+  }
+
+  .goban-more-item {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 16px;
+    margin: 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #eceae4;
+    font: 400 16px/1.2 system-ui, sans-serif;
+    color: #111;
+    text-align: left;
+    touch-action: manipulation;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+
+  .goban-more-item:last-of-type {
+    border-bottom: none;
+  }
+
+  .goban-more-cancel {
+    display: block;
+    margin: 4px 8px 8px auto;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    font: 600 14px/1 system-ui, sans-serif;
+    color: #333;
+    touch-action: manipulation;
+  }
+
+  #goban-full-ui {
+    display: none;
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
-    max-height: min(55vh, 420px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    top: 0;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    z-index: 35;
+    flex-direction: column;
     background: #f4f2ec;
-    border-top: 1px solid #b8b4ac;
     box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.18);
-    z-index: 30;
-    padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
   }
 
-  body.goban-more-open #goban-drawer > * {
+  body.goban-full-ui-open #goban-full-ui {
+    display: flex;
+  }
+
+  #goban-full-ui-bar {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
+    background: #eceae4;
+    border-bottom: 1px solid #c8c4bc;
+  }
+
+  #goban-full-ui-done {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    font: 600 14px/1 system-ui, sans-serif;
+    color: #111;
+    touch-action: manipulation;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+
+  #goban-drawer {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+  }
+
+  #goban-drawer > * {
     margin-bottom: 8px;
   }
 
-  /* Landscape: keep side panel usable; drawer still overlays from the bottom. */
+  /* Landscape: compact chrome + menus; Full UI leaves the nav row visible. */
   @media (orientation: landscape) and (min-height: 320px) {
     .goban-phone .besogo-control {
       flex-wrap: wrap;
@@ -253,6 +345,8 @@
 <script src="../vendor/besogo/js/parseSgf.js"></script>
 <script src="../vendor/besogo/js/loadSgf.js"></script>
 <script src="../vendor/besogo/js/saveSgf.js"></script>
+<script src="../src/fileActions.js"></script>
+<script src="../src/moreMenu.js"></script>
 <script src="../vendor/besogo/js/boardDisplay.js"></script>
 <script src="../vendor/besogo/js/coord.js"></script>
 <script src="../vendor/besogo/js/toolPanel.js"></script>
@@ -286,6 +380,7 @@
   var container = document.getElementById("target");
   besogo.create(container, options);
   setupPhoneChrome(container);
+  setupMoreMenu(container);
   setupModePicker(container);
 
   function makeMoreIcon() {
@@ -312,7 +407,6 @@
 
     var w = root.clientWidth;
     var h = root.clientHeight;
-    if (w >= h) return; // landscape: keep BesoGo fill side panel
 
     var navH = control.offsetHeight || 64;
     var boardSize = Math.min(w, h - navH);
@@ -335,26 +429,24 @@
       var panel = panels.querySelector(".besogo-" + name);
       if (panel) drawer.appendChild(panel);
     });
-    panels.appendChild(drawer);
 
-    var control = panels.querySelector(".besogo-control");
-    var moreBtn = document.createElement("button");
-    moreBtn.id = "goban-more-toggle";
-    moreBtn.type = "button";
-    moreBtn.setAttribute("aria-expanded", "false");
-    moreBtn.setAttribute("aria-controls", "goban-drawer");
-    moreBtn.setAttribute("aria-label", "More");
-    moreBtn.title = "Tools, tree, file, and game info";
-    moreBtn.appendChild(makeMoreIcon());
-    if (control) control.appendChild(moreBtn);
+    var fullUi = document.createElement("div");
+    fullUi.id = "goban-full-ui";
+    fullUi.setAttribute("aria-hidden", "true");
 
-    moreBtn.addEventListener("click", function () {
-      closeModeMenu();
-      var open = document.body.classList.toggle("goban-more-open");
-      drawer.setAttribute("aria-hidden", open ? "false" : "true");
-      moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
-      moreBtn.setAttribute("aria-label", open ? "Hide extra panels" : "More");
-      compactPhoneLayout(root);
+    var doneBar = document.createElement("div");
+    doneBar.id = "goban-full-ui-bar";
+    var doneBtn = document.createElement("button");
+    doneBtn.id = "goban-full-ui-done";
+    doneBtn.type = "button";
+    doneBtn.textContent = "Done";
+    doneBar.appendChild(doneBtn);
+    fullUi.appendChild(doneBar);
+    fullUi.appendChild(drawer);
+    document.body.appendChild(fullUi);
+
+    doneBtn.addEventListener("click", function () {
+      closeFullUi();
     });
 
     window.addEventListener("resize", function () {
@@ -363,6 +455,171 @@
       });
     });
     compactPhoneLayout(root);
+  }
+
+  function closeFullUi() {
+    if (!document.body.classList.contains("goban-full-ui-open")) return;
+    document.body.classList.remove("goban-full-ui-open");
+    var fullUi = document.getElementById("goban-full-ui");
+    var moreBtn = document.getElementById("goban-more-toggle");
+    if (fullUi) fullUi.setAttribute("aria-hidden", "true");
+    if (moreBtn) {
+      moreBtn.setAttribute("aria-expanded", "false");
+      moreBtn.setAttribute("aria-label", "More");
+    }
+  }
+
+  function closeMoreMenu() {
+    document.body.classList.remove("goban-more-menu-open");
+    var moreBtn = document.getElementById("goban-more-toggle");
+    if (moreBtn) {
+      moreBtn.setAttribute("aria-expanded", "false");
+      moreBtn.setAttribute("aria-label", "More");
+    }
+  }
+
+  function openFullUi() {
+    closeMoreMenu();
+    closeModeMenu();
+    document.body.classList.add("goban-full-ui-open");
+    var fullUi = document.getElementById("goban-full-ui");
+    var moreBtn = document.getElementById("goban-more-toggle");
+    if (fullUi) fullUi.setAttribute("aria-hidden", "false");
+    if (moreBtn) {
+      moreBtn.setAttribute("aria-expanded", "true");
+      moreBtn.setAttribute("aria-label", "Hide extra panels");
+    }
+  }
+
+  function setupMoreMenu(root) {
+    var editor = root.besogoEditor;
+    var panels = root.querySelector(".besogo-panels");
+    var control = panels && panels.querySelector(".besogo-control");
+    var moreBtn, backdrop, menu, fileInput, submenu = null;
+    if (!editor || !control || !besogo.moreMenu || !besogo.fileActions) return;
+
+    moreBtn = document.createElement("button");
+    moreBtn.id = "goban-more-toggle";
+    moreBtn.type = "button";
+    moreBtn.setAttribute("aria-haspopup", "dialog");
+    moreBtn.setAttribute("aria-expanded", "false");
+    moreBtn.setAttribute("aria-controls", "goban-more-menu");
+    moreBtn.setAttribute("aria-label", "More");
+    moreBtn.title = "New, load, save, and full UI";
+    moreBtn.appendChild(makeMoreIcon());
+    control.appendChild(moreBtn);
+
+    backdrop = document.createElement("div");
+    backdrop.id = "goban-more-backdrop";
+    document.body.appendChild(backdrop);
+
+    menu = document.createElement("div");
+    menu.id = "goban-more-menu";
+    menu.setAttribute("role", "dialog");
+    menu.setAttribute("aria-label", "More");
+    document.body.appendChild(menu);
+
+    fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.style.display = "none";
+    document.body.appendChild(fileInput);
+
+    function bindFileInput(input) {
+      input.addEventListener("change", function (evt) {
+        var file = evt.target.files && evt.target.files[0];
+        var replacement = document.createElement("input");
+        replacement.type = "file";
+        replacement.style.display = "none";
+        input.parentNode.replaceChild(replacement, input);
+        fileInput = replacement;
+        bindFileInput(fileInput);
+
+        if (!file) {
+          closeMoreMenu();
+          return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          if (confirm("Load '" + file.name + "'?\n" + besogo.fileActions.WARNING)) {
+            besogo.fileActions.setCurrentFileName(file.name);
+            besogo.fileActions.loadSgfText(editor, e.target.result);
+            closeMoreMenu();
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+    bindFileInput(fileInput);
+
+    function renderMenu() {
+      var list = submenu === "new" ? besogo.moreMenu.newSizes() : besogo.moreMenu.items();
+      menu.replaceChildren();
+      list.forEach(function (item) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "goban-more-item";
+        btn.textContent = item.label;
+        btn.setAttribute("aria-label", item.label);
+        btn.addEventListener("click", function () {
+          var result = besogo.moreMenu.applyChoice(editor, item, { confirm: confirm });
+          if (result.triggerLoad) {
+            fileInput.click();
+            return;
+          }
+          if (result.showSubmenu !== undefined) {
+            submenu = result.showSubmenu;
+            renderMenu();
+            return;
+          }
+          if (result.openFullUi) {
+            openFullUi();
+            return;
+          }
+          if (result.close) {
+            submenu = null;
+            closeMoreMenu();
+          }
+        });
+        menu.appendChild(btn);
+      });
+      var cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "goban-more-cancel";
+      cancel.textContent = "Cancel";
+      cancel.addEventListener("click", function () {
+        submenu = null;
+        closeMoreMenu();
+      });
+      menu.appendChild(cancel);
+    }
+
+    function openMenu() {
+      if (document.body.classList.contains("goban-full-ui-open")) {
+        closeFullUi();
+        return;
+      }
+      closeModeMenu();
+      submenu = null;
+      renderMenu();
+      document.body.classList.add("goban-more-menu-open");
+      moreBtn.setAttribute("aria-expanded", "true");
+    }
+
+    moreBtn.addEventListener("click", function () {
+      if (document.body.classList.contains("goban-full-ui-open")) {
+        closeFullUi();
+      } else if (document.body.classList.contains("goban-more-menu-open")) {
+        submenu = null;
+        closeMoreMenu();
+      } else {
+        openMenu();
+      }
+    });
+    backdrop.addEventListener("click", function () {
+      submenu = null;
+      closeMoreMenu();
+    });
   }
 
   function makeToolSvg(tool) {
@@ -414,14 +671,8 @@
     }
 
     function closeMore() {
-      if (!document.body.classList.contains("goban-more-open")) return;
-      document.body.classList.remove("goban-more-open");
-      var drawer = document.getElementById("goban-drawer");
-      if (drawer) drawer.setAttribute("aria-hidden", "true");
-      if (moreBtn) {
-        moreBtn.setAttribute("aria-expanded", "false");
-        moreBtn.setAttribute("aria-label", "More");
-      }
+      closeMoreMenu();
+      closeFullUi();
     }
 
     function renderMenu() {
