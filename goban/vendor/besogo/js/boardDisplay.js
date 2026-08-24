@@ -346,17 +346,41 @@ besogo.makeBoardDisplay = function(container, editor) {
         });
     }
 
+    function getRelocateHighlightMove(current) {
+        var target, move;
+        if (editor.getTool() !== 'relocate') {
+            return current.move;
+        }
+        target = editor.getRelocateTarget();
+        if (target && target.move && target.move.x >= 1 &&
+                current.getStone(target.move.x, target.move.y) === target.move.color) {
+            return target.move;
+        }
+        move = current.move;
+        if (move && move.x >= 1) {
+            return move;
+        }
+        return null;
+    }
+
     function getTetherStoneColor() {
         var tool = editor.getTool(),
-            current = editor.getCurrent();
+            current = editor.getCurrent(),
+            target;
         if (tool === 'playB') {
             return -1;
         }
         if (tool === 'playW') {
             return 1;
         }
-        if (tool === 'relocate' && current.move && current.move.color) {
-            return current.move.color;
+        if (tool === 'relocate') {
+            target = editor.getRelocateTarget();
+            if (target && target.move && target.move.color) {
+                return target.move.color;
+            }
+            if (current.move && current.move.color) {
+                return current.move.color;
+            }
         }
         return current.nextMove();
     }
@@ -585,9 +609,16 @@ besogo.makeBoardDisplay = function(container, editor) {
             cancelTether();
             return;
         }
-        var target = nearestIntersection(event.clientX, event.clientY);
+        var target = nearestIntersection(event.clientX, event.clientY),
+            current;
         if (!target) {
             return;
+        }
+        if (editor.getTool() === 'relocate') {
+            current = editor.getCurrent();
+            if (current.getStone(target.i, target.j)) {
+                return; // Occupied press selects via click handler, not tether
+            }
         }
         if (event.pointerType === 'touch' || event.pointerType === 'pen' ||
                 (event.pointerType === 'mouse' && event.button === 0)) {
@@ -699,7 +730,7 @@ besogo.makeBoardDisplay = function(container, editor) {
     function redrawMarkup(current) {
         var element, i, j, x, y, // Scratch iteration variables
             group = besogo.svgEl("g"), // Group holding markup layer elements
-            lastMove = current.move,
+            lastMove = getRelocateHighlightMove(current),
             variants = editor.getVariants(),
             mark, // Scratch mark state {0, 1, 2, 3, 4, 5}
             stone, // Scratch stone state {0, -1, 1}

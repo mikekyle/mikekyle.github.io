@@ -23,6 +23,7 @@ besogo.makeEditor = function(sizeX, sizeY) {
             'label', // label markup
             'relocate'], // move the current node's stone, keep later coords
         tool = 'auto', // Currently active tool (default: auto-mode)
+        relocateTarget = null, // Selected node for relocate tool (issue #28)
         label = "1", // Next label that will be applied
 
         navHistory = [], // Navigation history
@@ -62,6 +63,7 @@ besogo.makeEditor = function(sizeX, sizeY) {
         cutCurrent: cutCurrent,
         deleteCurrent: deleteCurrent,
         relocateCurrent: relocateCurrent,
+        getRelocateTarget: getRelocateTarget,
         promote: promote,
         demote: demote,
         getRoot: getRoot,
@@ -86,8 +88,17 @@ besogo.makeEditor = function(sizeX, sizeY) {
         }
         // Set the tool only if in list and actually changed
         if (TOOLS.indexOf(set) !== -1 && tool !== set) {
+            var wasRelocate = tool === 'relocate',
+                msg = { tool: set, label: label };
             tool = set;
-            notifyListeners({ tool: tool, label: label }); // Notify tool change
+            if (set === 'relocate') {
+                initRelocateTarget();
+                msg.markupChange = true;
+            } else if (wasRelocate) {
+                relocateTarget = null;
+                msg.markupChange = true;
+            }
+            notifyListeners(msg); // Notify tool change
             return true;
         }
         return false;
@@ -398,9 +409,54 @@ besogo.makeEditor = function(sizeX, sizeY) {
                 setMarkup(i, j, label);
                 break;
             case 'relocate':
-                relocateCurrent(i, j);
+                if (current.getStone(i, j)) {
+                    selectRelocateTarget(i, j);
+                } else {
+                    relocateSelected(i, j);
+                }
                 break;
         }
+    }
+
+    function getRelocateTarget() {
+        return relocateTarget;
+    }
+
+    function initRelocateTarget() {
+        if (current.move && current.move.x >= 1 && current.move.y >= 1) {
+            relocateTarget = current;
+        } else {
+            relocateTarget = null;
+        }
+    }
+
+    function selectRelocateTarget(i, j) {
+        var node;
+        if (i < 1 || j < 1) {
+            return false;
+        }
+        if (!current.getStone(i, j)) {
+            return false;
+        }
+        node = current.findMoveNode(i, j);
+        if (!node || node === relocateTarget) {
+            return false;
+        }
+        relocateTarget = node;
+        notifyListeners({ markupChange: true });
+        return true;
+    }
+
+    // Relocate the selected node; later nodes keep their coordinates (issue #28).
+    function relocateSelected(i, j) {
+        if (i < 1 || j < 1 || !relocateTarget) {
+            return false;
+        }
+        if (!relocateTarget.relocateMove(i, j)) {
+            return false;
+        }
+        notifyListeners({ treeChange: true, stoneChange: true, markupChange: true });
+        return true;
     }
 
     // Move the current node's stone; later nodes keep their coordinates (issue #24).
@@ -411,7 +467,12 @@ besogo.makeEditor = function(sizeX, sizeY) {
         if (!current.relocateMove(i, j)) {
             return false;
         }
-        notifyListeners({ treeChange: true, stoneChange: true });
+        if (tool === 'relocate') {
+            relocateTarget = current;
+            notifyListeners({ treeChange: true, stoneChange: true, markupChange: true });
+        } else {
+            notifyListeners({ treeChange: true, stoneChange: true });
+        }
         return true;
     }
 
@@ -568,6 +629,10 @@ besogo.makeEditor = function(sizeX, sizeY) {
         var i;
         if (!keepHistory && msg.navChange) {
             navHistory = []; // Clear navigation history
+        }
+        if (msg.navChange && tool === 'relocate') {
+            initRelocateTarget();
+            msg.markupChange = true;
         }
         for (i = 0; i < listeners.length; i++) {
             listeners[i](msg);

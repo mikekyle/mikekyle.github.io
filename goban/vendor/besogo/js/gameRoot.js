@@ -165,6 +165,30 @@ besogo.makeGameRoot = function(sizeX, sizeY) {
         }
     }
 
+    // Walk from this node toward the root to find the move stone at (x, y).
+    // Returns null for setup stones, empty points, or stones not on this line.
+    root.findMoveNode = function(x, y) {
+        var n = this,
+            color;
+        if (x < 1 || y < 1) {
+            return null;
+        }
+        color = this.getStone(x, y);
+        if (!color) {
+            return null;
+        }
+        while (n) {
+            if (n.setupStones[fromXY(x, y)]) {
+                return null;
+            }
+            if (n.move && n.move.x === x && n.move.y === y && n.move.color === color) {
+                return n;
+            }
+            n = n.parent;
+        }
+        return null;
+    };
+
     // Change this node's move point and replay all descendants. Sequence coords stay.
     root.relocateMove = function(x, y) {
         var color, tester;
