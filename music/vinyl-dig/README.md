@@ -1,1 +1,15 @@
-This folder contains a self-contained, mobile-friendly HTML view of the current vinyl-only `shortlist_vg_ship15_vinyl.json`; open `index.html` directly or serve the folder with any static web server. The page contains 196 Discogs listings sorted by delivered total in ascending GBP order, with client-side text filtering and the shortlist filters shown in the page header.
+# Vinyl dig (phone page)
+
+Self-contained static page for the horses-face ≥4★ vinyl shortlist.
+
+- `index.html` — mobile-first dark UI (search, expandable rows, alt listings)
+- `art/` — cached Discogs thumbs for the 30 cheapest enriched albums
+
+Rebuild from repo root:
+
+```bash
+.venv/bin/python enrich_shortlist.py   # top 30 + alts + art → shortlist_enriched.json
+.venv/bin/python build_site.py         # → site/index.html
+```
+
+Filters: vinyl only · media ≥ VG · postage ≤ £15 GBP · all master vinyl pressings.
