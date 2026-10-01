@@ -1,0 +1,1 @@
+This folder contains a self-contained, mobile-friendly HTML view of the current vinyl-only `shortlist_vg_ship15_vinyl.json`; open `index.html` directly or serve the folder with any static web server. The page contains 196 Discogs listings sorted by delivered total in ascending GBP order, with client-side text filtering and the shortlist filters shown in the page header.
